@@ -21,7 +21,7 @@
 *.lib
 
 # Executables
-Gomoku
+42run
 *.exe
 *.out
 *.app

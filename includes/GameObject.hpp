@@ -7,6 +7,7 @@ class GameObject
 {
 	public:
 		GameObject(std::string path);
+		void	GetObjValues(FILE *file);
 		~GameObject();
 
 		void	SetBuffers();

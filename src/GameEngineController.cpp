@@ -75,16 +75,85 @@ int		GameEngineController::InitOpenGL()
 
 // --------------------------------------------------------------------	//
 //																		//
+//	Shaders inits														//
+//																		//
+// --------------------------------------------------------------------	//
+
+void GameEngineController::LoadShaders()
+{
+	// -------------------------------------------------------------------------- //
+	//	Shaders																	  //
+	// -------------------------------------------------------------------------- //
+	// Go get Position shader
+	VertexShader_1 = GetFileContent("./shaders/easy_vshader_1.vs");
+	FragmentShader_1 = GetFileContent("./shaders/easy_fshader_1.fs");
+
+	// Create shader programme
+	GLuint vs = glCreateShader (GL_VERTEX_SHADER);
+	glShaderSource (vs, 1, (const char * const *)&VertexShader_1, NULL);
+	glCompileShader (vs);
+	GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
+	glShaderSource (fs, 1, (const char * const *)&FragmentShader_1, NULL);
+	glCompileShader (fs);
+
+	GLuint shader_programme = glCreateProgram ();
+	glAttachShader (shader_programme, fs);
+	glAttachShader (shader_programme, vs);
+	glLinkProgram (shader_programme);
+	glUseProgram(shader_programme);
+	MainShaderProgramme = shader_programme;
+}
+
+char		*GameEngineController::GetFileContent(std::string file_path)
+{
+	FILE *fp;
+	long lsize;
+	char *buffer;
+
+	fp = fopen(file_path.c_str(), "rb" );
+	if (!fp)
+	{
+		printf("Error opening file\n");
+		exit(-1);
+	}
+
+	fseek(fp, 0L, SEEK_END);
+	lsize = ftell(fp);
+	rewind(fp);
+
+	buffer = (char *)malloc(sizeof(char) * lsize);
+	if (!buffer)
+	{
+		printf("Error allocating vertex shader memory\n");
+		exit(-1);
+	}
+
+	if (fread(buffer, lsize, 1, fp) != 1)
+	{
+		fclose(fp);
+		free(buffer);
+		printf("entire read fails\n");
+		exit(1);
+	}
+	buffer[lsize] = '\0';
+	fclose(fp);
+	return (buffer);
+}
+
+// --------------------------------------------------------------------	//
+//																		//
 //	OPENGL objects inits												//
 //																		//
 // --------------------------------------------------------------------	//
 
 void	GameEngineController::LoadGameObjects()
 {
-	Character = new GameObject("./ressources/cube.obj");
+	Character = new GameObject("./ressources/teapot.obj");
+	Cube = new GameObject("./ressources/cube.obj");
 }
 
 void	GameEngineController::DrawObjects()
 {
 	Character->DrawObject();
+	Cube->DrawObject();
 }
