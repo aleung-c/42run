@@ -18,7 +18,21 @@ class GameEngineController
 		char						*FragmentShader_1;
 		GLuint						MainShaderProgramme;
 
-		glm::mat4					MatIdentity;
+		// matrix handling
+		glm::mat4							MatIdentity;
+		glm::mat4							MatTranslation;
+		glm::mat4							MatScaling;
+
+		glm::mat4							MatRotation;
+		// float								matrix_x_rotation[4][4];
+		// float								matrix_y_rotation[4][4];
+		// float								matrix_z_rotation[4][4];
+
+		glm::mat4							MatViewOrientation;
+		glm::mat4							MatViewtTranslation;
+
+		glm::mat4							MatPerspectiveProjection;
+		glm::mat4							MatOrthographicProjection;
 
 		GameEngineController();
 		~GameEngineController();
@@ -31,6 +45,8 @@ class GameEngineController
 
 		void			LoadShaders();
 		char			*GetFileContent(std::string file_path);
+
+		void			LoadMatrices();
 
 		void			LoadGameObjects();
 		void			DrawObjects();

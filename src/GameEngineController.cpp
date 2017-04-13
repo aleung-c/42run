@@ -142,6 +142,17 @@ char		*GameEngineController::GetFileContent(std::string file_path)
 
 // --------------------------------------------------------------------	//
 //																		//
+//	Matrices															//
+//																		//
+// --------------------------------------------------------------------	//
+
+void	GameEngineController::LoadMatrices()
+{
+
+}
+
+// --------------------------------------------------------------------	//
+//																		//
 //	OPENGL objects inits												//
 //																		//
 // --------------------------------------------------------------------	//
@@ -151,6 +162,13 @@ void	GameEngineController::LoadGameObjects()
 	Character = new GameObject("./ressources/teapot.obj");
 	Cube = new GameObject("./ressources/cube.obj");
 }
+
+
+// --------------------------------------------------------------------	//
+//																		//
+//	Engine side drawing													//
+//																		//
+// --------------------------------------------------------------------	//
 
 void	GameEngineController::DrawObjects()
 {
