@@ -1,3 +1,8 @@
+#ifndef GLOBALGAMECONTROLLER
+# define GLOBALGAMECONTROLLER
+
+# include "QDrun.hpp"
+
 /*
 **	Global controller for the game.
 **	Will handle all game states, and ultra high level 
@@ -7,8 +12,13 @@
 class GlobalGameController
 {
 	public:
+		GameEngineController	GameEngine;
+
 		GlobalGameController();
 		~GlobalGameController();
 	
-		void InitGame();
+		void	InitGame();
+		void	MainLoop();
 };
+
+#endif

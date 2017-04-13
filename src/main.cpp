@@ -6,5 +6,6 @@ int		main(void)
 
 	std::cout << "Hello 42run" << std::endl;
 	GameController.InitGame();
+	GameController.MainLoop();
 	return 0;
 }
