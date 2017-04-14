@@ -9,6 +9,7 @@ NAME = 42run
 SRC = ./src/main.cpp \
 ./src/GameObject.cpp \
 ./src/GameEngineController.cpp \
+./src/GamePlayController.cpp \
 ./src/GlobalGameController.cpp
 
 OBJ = $(SRC:.cpp=.o)

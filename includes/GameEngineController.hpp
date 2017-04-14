@@ -21,8 +21,7 @@ class GameEngineController
 
 		std::vector<GameObject *>	GameObjectList;
 
-		GameObject					*Character;
-		GameObject					*Cube;
+		GameObject					*MainCamera;
 
 		char						*VertexShader_1;
 		char						*FragmentShader_1;
@@ -30,21 +29,31 @@ class GameEngineController
 
 		// matrix handling
 		// model
+		glm::mat4							BaseMatModelIdentity;
+		glm::mat4							BaseMatModelTranslation;
+		glm::mat4							BaseMatModelRotation;
+		glm::mat4							BaseMatModelScaling;
+
 		glm::mat4							MatModelIdentity;
 		glm::mat4							MatModelTranslation;
-		glm::mat4							MatModelScaling;
 		glm::mat4							MatModelRotation;
+		glm::mat4							MatModelScaling;
 		// float								matrix_x_rotation[4][4];
 		// float								matrix_y_rotation[4][4];
 		// float								matrix_z_rotation[4][4];
 
 		// view -> camera
-		glm::mat4							MatViewOrientation;
-		glm::mat4							MatViewTranslation;
+		float								CameraNear;
+		float								CameraFar;
+		float								CameraFov;
+		float								CameraAspect;
 
 		// projection -> persp or ortho
 		glm::mat4							MatPerspectiveProjection;
 		glm::mat4							MatOrthographicProjection;
+
+		glm::mat4							MatModel;
+		glm::mat4							MatView;
 
 		glm::mat4							MatMVP;
 
@@ -62,6 +71,7 @@ class GameEngineController
 
 		void			LoadMatrices();
 
+		void			ApplyMatricesToObject(GameObject *Object);
 		void			DrawObjects();
 
 	private:

@@ -13,11 +13,16 @@ class GlobalGameController
 {
 	public:
 		GameEngineController	*GameEngine;
+		GamePlayController		Game;
+
+		GameObject *Character;
+		GameObject *teapot;
 
 		GlobalGameController();
 		~GlobalGameController();
 	
 		void	InitGame();
+		void	CheckForOpenGLError();
 		void	MainLoop();
 };
 

@@ -17,7 +17,7 @@
 
 GameObject::GameObject(std::string objName)
 {
-	_hasModel = false;
+	HasModel = false;
 	Name = objName;
 	InitValues();
 	GameEngineController::Instance().GameObjectList.push_back(this);
@@ -40,7 +40,7 @@ GameObject::GameObject(std::string objName, std::string path)
 		return ;
 	}
 	Name = objName;
-	_hasModel = true;
+	HasModel = true;
 	InitValues();
 	GetObjValues(file);
 	SetBuffers();
@@ -78,7 +78,7 @@ void		GameObject::GetObjValues(FILE *file)
 			{
 				glm::vec4	vertex;
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-				vertex.w = 0.0;
+				vertex.w = 1.0;
 				_objVertices.push_back(vertex);
 				//printf("%f %f %f %f\n", vertex.x, vertex.y, vertex.z, vertex.w);
 			}
@@ -192,7 +192,7 @@ void		GameObject::DrawObject()
 	// glEnableVertexAttribArray(1);
 	// glEnableVertexAttribArray(2);
 	// glEnableVertexAttribArray(3);
-	if (_hasModel == true)
+	if (HasModel == true)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);

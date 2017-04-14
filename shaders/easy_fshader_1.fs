@@ -1,6 +1,7 @@
 #version 410
 
-out vec4 frag_colour;
+out vec4	frag_colour;
+in	vec4	vertex_position;
 
 void main()
 {

@@ -43,6 +43,7 @@
 
 // lib GML
 # include "../glm/glm/glm.hpp"
+# include "../glm/glm/gtc/matrix_transform.hpp"
 
 // linking GLFW
 # include "../glfw-3.2.1/include/GLFW/glfw3.h"
@@ -69,6 +70,11 @@
 # define WINDOW_HEIGHT 720
 
 /*
+**	
+*/
+
+
+/*
 **	Global 42run struct
 */
 
@@ -79,10 +85,12 @@ typedef struct		s_GameDatas
 
 class				GameObject;
 class				GameEngineController;
+class				GamePlayController;
 class				GlobalGameController;
 
 # include "GameObject.hpp"
 # include "GameEngineController.hpp"
+# include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"
 
 

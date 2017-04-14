@@ -13,6 +13,7 @@ class GameObject
 		~GameObject();
 
 		std::string						Name;
+		bool							HasModel;
 
 		glm::vec3						Position;
 		glm::vec3						Rotation;
@@ -26,7 +27,7 @@ class GameObject
 		void	DrawObject();
 	
 	private:
-		bool							_hasModel;
+		
 		GLuint							_vao;
 
 		GLuint							_fvbo;

@@ -2,7 +2,7 @@
 
 GameEngineController& GameEngineController::Instance()
 {
-    return m_instance;
+	return m_instance;
 }
 
 GameEngineController::GameEngineController()
@@ -22,6 +22,8 @@ void		GameEngineController::InitEngine()
 		std::cout << "Initialization error. Exiting..." << std::endl;
 		exit (-1);
 	}
+	LoadShaders();
+	LoadMatrices();
 	//LoadGameObjects();
 }
 
@@ -69,7 +71,8 @@ int		GameEngineController::InitOpenGL()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
-	//glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
 
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
@@ -90,7 +93,7 @@ void GameEngineController::LoadShaders()
 	//	Shaders																	  //
 	// -------------------------------------------------------------------------- //
 	// Go get Position shader
-	VertexShader_1 = GetFileContent("./shaders/easy_vshader_1.vs");
+	VertexShader_1 = GetFileContent("./shaders/vshader_1.vs");
 	FragmentShader_1 = GetFileContent("./shaders/easy_fshader_1.fs");
 
 	// Create shader programme
@@ -148,12 +151,66 @@ char		*GameEngineController::GetFileContent(std::string file_path)
 // --------------------------------------------------------------------	//
 //																		//
 //	Matrices															//
+//	This creates the usual MODEL - VIEW - PROJECTION					//
+//	matrice.															//
 //																		//
 // --------------------------------------------------------------------	//
 
+/*
+**	This method initialize the VIEW and PROJECTION matrices.
+**	The MODEL matrice will be set for each object at runtime.
+**	Same goes for the merge into the MVP matrice.
+*/
+
 void	GameEngineController::LoadMatrices()
 {
+	// View matrices init;
+	MainCamera = new GameObject("MainCamera");
+	MainCamera->Position = glm::vec3(0.0, 2.0, 10.0);
+	MatView = glm::lookAt(
+		MainCamera->Position,
+		glm::vec3(0.0, 0.0, 0.0), // regarde l'origine
+		glm::vec3(0.0, 2.0, 0.0)  // La tête est vers le haut (utilisez 0,-1,0 pour regarder à l'envers) 
+	);
+
+	// Project matrices init;
+	CameraNear = 0.1;
+	CameraFar = 100.0;
+	CameraFov = 90.0;
+	CameraAspect = 1.77; // 4/3, 16/9, etc 1 = 4/4
+	MatPerspectiveProjection = glm::perspective(CameraFov, CameraAspect, CameraNear, CameraFar);
+}
+
+/*
+**	For one object of our scene, 
+*/
+
+void GameEngineController::ApplyMatricesToObject(GameObject *Object)
+{
+	// generate model matrice for each GameObject.
+	// Identity matrice -> base for our calculations.
 	MatModelIdentity = glm::mat4();
+	// Translation
+	MatModelTranslation = glm::translate(MatModelIdentity, Object->Position);
+	// Rotation : x > y > z
+	MatModelRotation = glm::rotate(MatModelIdentity, (glm::mediump_float)Object->Rotation.x, glm::vec3(1.0, 0.0, 0.0));
+	MatModelRotation = glm::rotate(MatModelRotation, (glm::mediump_float)Object->Rotation.y, glm::vec3(0.0, 1.0, 0.0));
+	MatModelRotation = glm::rotate(MatModelRotation, (glm::mediump_float)Object->Rotation.z, glm::vec3(0.0, 0.0, 1.0));
+	// Scaling
+	MatModelScaling = glm::scale(MatModelIdentity, Object->Scale);
+
+	// Merge MODEL matrice.
+	MatModel = MatModelTranslation * MatModelRotation * MatModelScaling;
+
+	// Merge MVP matrice.
+	MatMVP = MatPerspectiveProjection * MatView * MatModel;
+
+	// Send it to shader.
+	GLint uniform_mat = glGetUniformLocation(MainShaderProgramme, "mvp_matrix");
+	if (uniform_mat != -1)
+	{
+		glUniformMatrix4fv(uniform_mat, 1, GL_FALSE, &MatMVP[0][0]);
+	}
 }
 
 // --------------------------------------------------------------------	//
@@ -168,10 +225,19 @@ void	GameEngineController::LoadMatrices()
 
 void	GameEngineController::DrawObjects()
 {
+	glUseProgram(MainShaderProgramme);
+	// wipe the drawing surface clear
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// run through each object to set their matrices and draw them on screen.
 	for (std::vector<GameObject *>::iterator it = GameObjectList.begin();
 		it != GameObjectList.end();
 		it++)
 	{
-		(*it)->DrawObject();
+		if ((*it)->HasModel == true)
+		{
+			ApplyMatricesToObject(*it);
+			(*it)->DrawObject();
+		}
 	}
 }
