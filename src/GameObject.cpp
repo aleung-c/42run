@@ -20,6 +20,8 @@ GameObject::GameObject(std::string objName)
 	HasModel = false;
 	Name = objName;
 	InitValues();
+
+	// Add this object to the engine's list of objects.
 	GameEngineController::Instance().GameObjectList.push_back(this);
 }
 
@@ -44,6 +46,8 @@ GameObject::GameObject(std::string objName, std::string path)
 	InitValues();
 	GetObjValues(file);
 	SetBuffers();
+	// TODO: load textures.
+	// Add this object to the engine's list of objects.
 	GameEngineController::Instance().GameObjectList.push_back(this);
 }
 
@@ -80,7 +84,6 @@ void		GameObject::GetObjValues(FILE *file)
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 				vertex.w = 1.0;
 				_objVertices.push_back(vertex);
-				//printf("%f %f %f %f\n", vertex.x, vertex.y, vertex.z, vertex.w);
 			}
 			else if (strncmp(lineHeader, "vt", 10) == 0)
 			{

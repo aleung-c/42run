@@ -24,7 +24,6 @@ void		GameEngineController::InitEngine()
 	}
 	LoadShaders();
 	LoadMatrices();
-	//LoadGameObjects();
 }
 
 
