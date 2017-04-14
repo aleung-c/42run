@@ -6,14 +6,27 @@
 class GameObject
 {
 	public:
-		GameObject(std::string path);
+		GameObject(std::string objName);
+		GameObject(std::string objName, std::string path);
+		void	InitValues();
 		void	GetObjValues(FILE *file);
 		~GameObject();
+
+		std::string						Name;
+
+		glm::vec3						Position;
+		glm::vec3						Rotation;
+		glm::vec3						Scale;
+
+		glm::vec3						BoundingBoxMin;
+		glm::vec3						BoundingBoxMax;
+		glm::vec3						BoundingBoxCenter;
 
 		void	SetBuffers();
 		void	DrawObject();
 	
 	private:
+		bool							_hasModel;
 		GLuint							_vao;
 
 		GLuint							_fvbo;

@@ -1,6 +1,35 @@
 # include "../includes/QDrun.hpp"
 
-GameObject::GameObject(std::string path)
+// --------------------------------------------------------------------	//
+//																		//
+//	This is the class for and object in the game						//
+//	An object can OR NOT have a model. If it does, it is loaded			//
+//	Every object has a NAME, it will be useful to search through them.	//
+//	Also, every object has some variables such as position, rotation,	//
+//	etc etc ...															//
+//																		//
+// --------------------------------------------------------------------	//
+
+/*
+**	The constructor for an object without a model.
+**	We can imagine the camera for example, or a simple point in world space.
+*/
+
+GameObject::GameObject(std::string objName)
+{
+	_hasModel = false;
+	Name = objName;
+	InitValues();
+	GameEngineController::Instance().GameObjectList.push_back(this);
+}
+
+/*
+**	The constructor for an object with a model.
+**	This will load the buffers required, and allow this object
+**	to be "drawn" by the engine.
+*/
+
+GameObject::GameObject(std::string objName, std::string path)
 {
 	FILE * file;
 
@@ -10,9 +39,29 @@ GameObject::GameObject(std::string path)
 		std::cout << "Impossible to open the file !" << std::endl;
 		return ;
 	}
+	Name = objName;
+	_hasModel = true;
+	InitValues();
 	GetObjValues(file);
 	SetBuffers();
+	GameEngineController::Instance().GameObjectList.push_back(this);
 }
+
+void		GameObject::InitValues()
+{
+	Position = glm::vec3(0.0, 0.0, 0.0);
+	// for now, we will imagine euleur rotations.
+	Rotation = glm::vec3(0.0, 0.0, 0.0);
+	Scale = glm::vec3(1.0, 1.0, 1.0);
+
+	BoundingBoxMin = glm::vec3(0.0, 0.0, 0.0);
+	BoundingBoxMax = glm::vec3(0.0, 0.0, 0.0);
+	BoundingBoxCenter = glm::vec3(0.0, 0.0, 0.0);
+}
+
+/*
+** The loader for our obj files.
+*/
 
 void		GameObject::GetObjValues(FILE *file)
 {
@@ -22,7 +71,7 @@ void		GameObject::GetObjValues(FILE *file)
 		// read the first word of the line
 		int res = fscanf(file, "%s", lineHeader);
 		if (res == EOF)
-			break; // EOF = End Of File. Quit the loop.
+			break ;
 		else
 		{
 			if (strncmp(lineHeader, "v", 10) == 0)
@@ -143,14 +192,16 @@ void		GameObject::DrawObject()
 	// glEnableVertexAttribArray(1);
 	// glEnableVertexAttribArray(2);
 	// glEnableVertexAttribArray(3);
+	if (_hasModel == true)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(0);
+		glDrawArrays (GL_POINTS, 0, _objVertices.size());
 
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(0);
-	glDrawArrays (GL_POINTS, 0, _objVertices.size());
-
-	glDisableVertexAttribArray(1);
-	// glDisableVertexAttribArray(1);
-	// glDisableVertexAttribArray(2);
-	// glDisableVertexAttribArray(3);
+		glDisableVertexAttribArray(0);
+		// glDisableVertexAttribArray(1);
+		// glDisableVertexAttribArray(2);
+		// glDisableVertexAttribArray(3);
+	}
 }

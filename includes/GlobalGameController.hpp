@@ -12,7 +12,7 @@
 class GlobalGameController
 {
 	public:
-		GameEngineController	GameEngine;
+		GameEngineController	*GameEngine;
 
 		GlobalGameController();
 		~GlobalGameController();

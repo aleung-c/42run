@@ -1,5 +1,10 @@
 #include "../includes/QDrun.hpp"
 
+GameEngineController& GameEngineController::Instance()
+{
+    return m_instance;
+}
+
 GameEngineController::GameEngineController()
 {
 
@@ -17,7 +22,7 @@ void		GameEngineController::InitEngine()
 		std::cout << "Initialization error. Exiting..." << std::endl;
 		exit (-1);
 	}
-	LoadGameObjects();
+	//LoadGameObjects();
 }
 
 
@@ -148,30 +153,25 @@ char		*GameEngineController::GetFileContent(std::string file_path)
 
 void	GameEngineController::LoadMatrices()
 {
-
+	MatModelIdentity = glm::mat4();
 }
-
-// --------------------------------------------------------------------	//
-//																		//
-//	OPENGL objects inits												//
-//																		//
-// --------------------------------------------------------------------	//
-
-void	GameEngineController::LoadGameObjects()
-{
-	Character = new GameObject("./ressources/teapot.obj");
-	Cube = new GameObject("./ressources/cube.obj");
-}
-
 
 // --------------------------------------------------------------------	//
 //																		//
 //	Engine side drawing													//
 //																		//
 // --------------------------------------------------------------------	//
+/*
+**	When a GameObject is created, it goes into the GameObjectList, 
+**	and the engine will draw it if it has a model.
+*/
 
 void	GameEngineController::DrawObjects()
 {
-	Character->DrawObject();
-	Cube->DrawObject();
+	for (std::vector<GameObject *>::iterator it = GameObjectList.begin();
+		it != GameObjectList.end();
+		it++)
+	{
+		(*it)->DrawObject();
+	}
 }

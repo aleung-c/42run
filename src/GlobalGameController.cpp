@@ -17,8 +17,13 @@ GlobalGameController::~GlobalGameController()
 
 void	GlobalGameController::InitGame()
 {
-	GameEngine.InitEngine();
-	GameEngine.LoadShaders();
+	GameEngine->InitEngine();
+	GameEngine->LoadShaders();
+	GameObject *Character = new GameObject("Character", "./ressources/teapot.obj");
+	if (Character)
+	{
+		std::cout << "hello char" << std::endl;
+	}
 }
 
 void	GlobalGameController::MainLoop()
@@ -29,7 +34,7 @@ void	GlobalGameController::MainLoop()
 	// -------------------------------------------------------------------------- //
 	// check if shader is compiled and linked;
 	GLint isLinked = 0;
-	glGetProgramiv(GameEngine.MainShaderProgramme, GL_LINK_STATUS, &isLinked);
+	glGetProgramiv(GameEngine->MainShaderProgramme, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE)
 		printf(KRED "Error: Shader programme NOT linked%s\n", KRESET);
 	else
@@ -49,16 +54,16 @@ void	GlobalGameController::MainLoop()
 	//	drawing																	  //
 	// -------------------------------------------------------------------------- //
 
-	while (!glfwWindowShouldClose(GameEngine.Window))
+	while (!glfwWindowShouldClose(GameEngine->Window))
 	{
 		// wipe the drawing surface clear
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(GameEngine.MainShaderProgramme);
+		glUseProgram(GameEngine->MainShaderProgramme);
 		// event_process(sc);
-		GameEngine.DrawObjects();
+		GameEngine->DrawObjects();
 
 		glfwPollEvents();
 		// put the stuff we've been drawing onto the display
-		glfwSwapBuffers(GameEngine.Window);
+		glfwSwapBuffers(GameEngine->Window);
 	}
 }
