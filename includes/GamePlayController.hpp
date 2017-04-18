@@ -8,6 +8,8 @@ class GamePlayController
 		GameObject					*teapot;
 		GameObject					*BasicWall;
 
+		GameTextObject				*HelloText;
+
 		std::vector<GameObject *>	WorldObjects;
 
 		GamePlayController();

@@ -14,18 +14,24 @@ class GameEngineController
 {
 	public:
 		// this is a singleton
-		static GameEngineController&	Instance();
+		static GameEngineController&		Instance();
 
-		GLFWwindow		*Window;
+		GLFWwindow							*Window;
 
 
-		std::vector<GameObject *>	GameObjectList;
+		std::vector<GameObject *>			GameObjectList;
+		std::vector<GameTextObject *>		GameTextObjectList;
 
-		GameObject					*MainCamera;
+		GameObject							*MainCamera;
 
-		char						*VertexShader_1;
-		char						*FragmentShader_1;
-		GLuint						MainShaderProgramme;
+		char								*VertexShader_1;
+		char								*FragmentShader_1;
+
+		char								*TextVShader;
+		char								*TextFShader;
+
+		GLuint								MainShaderProgramme;
+		GLuint								TextShaderProgramme;
 
 		// matrix handling
 		// model
@@ -57,6 +63,13 @@ class GameEngineController
 
 		glm::mat4							MatMVP;
 
+		// fonts
+		FT_Library							FT_Lib;
+		FT_Face								Face;
+
+		// map of asciis 128 characters.
+		std::map<GLchar, Character>			Characters;
+
 		GameEngineController();
 		~GameEngineController();
 	
@@ -65,6 +78,8 @@ class GameEngineController
 		
 		int				InitGLFW();
 		int				InitOpenGL();
+		int				InitFreeType();
+		void			LoadFreeTypesCharacters();
 
 		void			LoadShaders();
 		char			*GetFileContent(std::string file_path);
@@ -73,7 +88,14 @@ class GameEngineController
 
 		void			ApplyMatricesToObject(GameObject *Object);
 		void			LoadObjectTexture(GameObject *Object);
+		void			RenderText(GameTextObject *obj);
+
 		void			Draw();
+		void			DrawTextObjects();
+		void			Draw3DModels();
+
+
+
 
 	private:
 		static GameEngineController m_instance;

@@ -17,11 +17,14 @@ GameEngineController::~GameEngineController()
 
 void		GameEngineController::InitEngine()
 {
-	if (InitGLFW() == -1 || InitOpenGL() == -1)
+	if (InitGLFW() == -1
+		|| InitOpenGL() == -1
+		|| InitFreeType() == -1)
 	{
 		std::cout << "Initialization error. Exiting..." << std::endl;
 		exit (-1);
 	}
+	
 	LoadShaders();
 	LoadMatrices();
 }
@@ -29,7 +32,7 @@ void		GameEngineController::InitEngine()
 
 // --------------------------------------------------------------------	//
 //																		//
-//	GLFW and OPENGL inits												//
+//	Library inits														//
 //																		//
 // --------------------------------------------------------------------	//
 
@@ -69,15 +72,87 @@ int		GameEngineController::InitOpenGL()
 	//glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
+
 	glFrontFace(GL_CCW);
 	glEnable(GL_CULL_FACE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	glewInit();
 #endif
 	return (0);
+}
+
+int		GameEngineController::InitFreeType()
+{
+	if (FT_Init_FreeType(&FT_Lib))
+	{
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return (-1);
+	}
+	// Get one font
+	int error = FT_New_Face(FT_Lib,
+				"./ressources/fonts/Roboto_Condensed/RobotoCondensed-Regular.ttf", 0, &Face);
+	if (error == FT_Err_Unknown_File_Format)
+	{
+		std::cout << KRED "FreeType init: Font format not supported" KRESET << std::endl;
+		return (-1);
+	}
+	else if (error)
+	{
+		std::cout << KRED "FreeType init: Cant open or read font file." KRESET << std::endl;
+		return (-1);
+	}
+	FT_Set_Pixel_Sizes(Face, 0, 48);
+	LoadFreeTypesCharacters();
+	return (0);
+}
+
+/*
+**	In here, we stock asciis first 128 characters from truetype font into a map
+**	that we will use to draw our letters.
+*/
+
+void	GameEngineController::LoadFreeTypesCharacters()
+{
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
+	for (GLubyte c = 0; c < 128; c++)
+	{
+		// Load character glyph 
+		if (FT_Load_Char(Face, c, FT_LOAD_RENDER))
+		{
+		std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+			continue;
+		}
+		// Generate texture
+		GLuint	texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED,
+			Face->glyph->bitmap.width,
+			Face->glyph->bitmap.rows,
+			0, GL_RED, GL_UNSIGNED_BYTE, Face->glyph->bitmap.buffer);
+
+		// Set texture options
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		 // Now store character for later use
+		Character character = {
+			texture, 
+			glm::ivec2(Face->glyph->bitmap.width, Face->glyph->bitmap.rows),
+			glm::ivec2(Face->glyph->bitmap_left, Face->glyph->bitmap_top),
+			Face->glyph->advance.x
+		};
+		Characters.insert(std::pair<GLchar, Character>(c, character));
+	}
+	FT_Done_Face(Face);
+	FT_Done_FreeType(FT_Lib);
 }
 
 // --------------------------------------------------------------------	//
@@ -89,26 +164,45 @@ int		GameEngineController::InitOpenGL()
 void GameEngineController::LoadShaders()
 {
 	// -------------------------------------------------------------------------- //
-	//	Shaders																	  //
+	//	3d model Shaders -> main shader											  //
 	// -------------------------------------------------------------------------- //
 	// Go get Position shader
 	VertexShader_1 = GetFileContent("./shaders/vshader_1.vs");
 	FragmentShader_1 = GetFileContent("./shaders/fshader_1.fs");
 
 	// Create shader programme
-	GLuint vs = glCreateShader (GL_VERTEX_SHADER);
-	glShaderSource (vs, 1, (const char * const *)&VertexShader_1, NULL);
-	glCompileShader (vs);
-	GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
-	glShaderSource (fs, 1, (const char * const *)&FragmentShader_1, NULL);
-	glCompileShader (fs);
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vs, 1, (const char * const *)&VertexShader_1, NULL);
+	glCompileShader(vs);
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fs, 1, (const char * const *)&FragmentShader_1, NULL);
+	glCompileShader(fs);
 
 	GLuint shader_programme = glCreateProgram ();
-	glAttachShader (shader_programme, fs);
-	glAttachShader (shader_programme, vs);
+	glAttachShader(shader_programme, fs);
+	glAttachShader(shader_programme, vs);
 	glLinkProgram (shader_programme);
-	glUseProgram(shader_programme);
 	MainShaderProgramme = shader_programme;
+
+	// -------------------------------------------------------------------------- //
+	//	Text Shaders															  //
+	// -------------------------------------------------------------------------- //
+	TextVShader = GetFileContent("./shaders/text_vshader_1.vs");
+	TextFShader = GetFileContent("./shaders/text_fshader_1.fs");
+
+	// Create shader programme
+	GLuint vs2 = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vs2, 1, (const char * const *)&TextVShader, NULL);
+	glCompileShader(vs2);
+	GLuint fs2 = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fs2, 1, (const char * const *)&TextFShader, NULL);
+	glCompileShader(fs2);
+
+	GLuint shader_programme2 = glCreateProgram ();
+	glAttachShader(shader_programme2, fs2);
+	glAttachShader(shader_programme2, vs2);
+	glLinkProgram (shader_programme2);
+	TextShaderProgramme = shader_programme2;
 }
 
 char		*GameEngineController::GetFileContent(std::string file_path)
@@ -178,6 +272,13 @@ void	GameEngineController::LoadMatrices()
 	CameraFov = 90.0;
 	CameraAspect = 1.77; // 4/3, 16/9, etc 1 = 4/4
 	MatPerspectiveProjection = glm::perspective(CameraFov, CameraAspect, CameraNear, CameraFar);
+
+	MatOrthographicProjection = glm::ortho(0.0f, (float)WINDOW_WIDTH, 0.0f, (float)WINDOW_HEIGHT);
+	GLint uniform_mat = glGetUniformLocation(TextShaderProgramme, "projection_matrix");
+	if (uniform_mat != -1)
+	{
+		glUniformMatrix4fv(uniform_mat, 1, GL_FALSE, &MatOrthographicProjection[0][0]);
+	}
 }
 
 /*
@@ -250,6 +351,67 @@ void	GameEngineController::LoadObjectTexture(GameObject *Object)
 
 // --------------------------------------------------------------------	//
 //																		//
+//	Text																//
+//	Handle displaying of GameTextObjects								//
+//																		//
+// --------------------------------------------------------------------	//
+
+void	GameEngineController::RenderText(GameTextObject *obj)
+{
+	glUniform3f(glGetUniformLocation(TextShaderProgramme, "textColor"),
+		obj->Color.x, obj->Color.y, obj->Color.z);
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(obj->GetVao());
+
+	int tmp_x = obj->Position.x;
+	int tmp_y = obj->Position.y;
+
+	// Iterate through all characters
+	std::string::const_iterator c;
+	for (c = obj->Text.begin(); c != obj->Text.end(); c++)
+	{
+		Character ch = Characters[*c]; // take the struct in the map.
+
+		GLfloat xpos = tmp_x + ch.Bearing.x * obj->Scale;
+		GLfloat ypos = tmp_y - (ch.Size.y - ch.Bearing.y) * obj->Scale;
+
+		GLfloat w = ch.Size.x * obj->Scale;
+		GLfloat h = ch.Size.y * obj->Scale;
+		// Update VBO for each character
+		// That is two triangles forming a quad.
+		GLfloat vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0, 0.0 },
+			{ xpos,     ypos,       0.0, 1.0 },
+			{ xpos + w, ypos,       1.0, 1.0 },
+
+			{ xpos,     ypos + h,   0.0, 0.0 },
+			{ xpos + w, ypos,       1.0, 1.0 },
+			{ xpos + w, ypos + h,   1.0, 0.0 }
+		};
+		// (void)vertices;
+		glActiveTexture(GL_TEXTURE0);
+		// Render glyph texture over quad
+		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		// GLuint uniform_mat = glGetUniformLocation(TextShaderProgramme, "text");
+		// glUniform1i(uniform_mat, 0);
+		// Update content of VBO memory
+		glBindBuffer(GL_ARRAY_BUFFER, obj->GetVbo());
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); 
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(0);
+		// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// 	// Render quad
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	// 	// Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+		tmp_x += (ch.Advance >> 6) * obj->Scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+	}
+	// glBindVertexArray(0);
+	// glBindTexture(GL_TEXTURE_2D, 0);
+	glDisableVertexAttribArray(0);
+}
+
+// --------------------------------------------------------------------	//
+//																		//
 //	Engine side drawing													//
 //																		//
 // --------------------------------------------------------------------	//
@@ -260,11 +422,38 @@ void	GameEngineController::LoadObjectTexture(GameObject *Object)
 
 void	GameEngineController::Draw()
 {
-	glUseProgram(MainShaderProgramme);
-	// wipe the drawing surface clear
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// draw objects
+	DrawTextObjects();
+	Draw3DModels();
+
+	// display on screen.
+	glfwSwapBuffers(Window);
+}
+
+/*
+** Run through and display each GameTextObject and render the text.
+*/
+
+void	GameEngineController::DrawTextObjects()
+{
+	glUseProgram(TextShaderProgramme);
+	for (std::vector<GameTextObject *>::iterator it = GameTextObjectList.begin();
+		it != GameTextObjectList.end();
+		it++)
+	{
+		RenderText(*it);
+	}
+}
+
+/*
+** Run through and display each GameObject that has a model/texture.
+*/
+
+void	GameEngineController::Draw3DModels()
+{
+	glUseProgram(MainShaderProgramme);
+	// draw 3d objects
 	// run through each object to set their matrices and textures and draw them on screen.
 	for (std::vector<GameObject *>::iterator it = GameObjectList.begin();
 		it != GameObjectList.end();
@@ -272,13 +461,9 @@ void	GameEngineController::Draw()
 	{
 		// texture loading.
 		if ((*it)->HasTexture == true)
-		{
 			LoadObjectTexture(*it);
-		}
 		else
-		{
 			glUniform1i(glGetUniformLocation(MainShaderProgramme, "has_texture"), GL_FALSE);
-		}
 		// opengl buffer loading.
 		if ((*it)->HasModel == true)
 		{
@@ -286,7 +471,4 @@ void	GameEngineController::Draw()
 			(*it)->DrawObject();
 		}
 	}
-
-	// display on screen.
-	glfwSwapBuffers(Window);
 }

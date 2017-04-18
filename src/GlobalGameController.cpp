@@ -23,14 +23,35 @@ void	GlobalGameController::InitGame()
 
 void	GlobalGameController::CheckForOpenGLError()
 {
+	int error = 0;
+
 	// check if shader is compiled and linked;
 	GLint isLinked = 0;
 	glGetProgramiv(GameEngine->MainShaderProgramme, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE)
-		printf(KRED "Error: Shader programme NOT linked%s\n", KRESET);
+	{
+		printf(KRED "Error: Main Shader programme NOT linked%s\n", KRESET);
+		error = -1;
+	}
 	else
 	{
-		printf(KGRN "Shader programme linked%s\n", KRESET);
+		printf(KGRN "Main Shader programme linked%s\n", KRESET);
+	}
+
+	// check if shader is compiled and linked;
+	isLinked = 0;
+	glGetProgramiv(GameEngine->TextShaderProgramme, GL_LINK_STATUS, &isLinked);
+	if (isLinked == GL_FALSE)
+	{
+		printf(KRED "Error: Text Shader programme NOT linked%s\n", KRESET);
+		error = -1;
+	}
+	else
+	{
+		printf(KGRN "Text Shader programme linked%s\n", KRESET);
+	}
+	if (error == 0)
+	{
 		return ;
 	}
 

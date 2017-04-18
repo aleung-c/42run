@@ -18,16 +18,19 @@ GamePlayController::~GamePlayController()
 
 void	GamePlayController::InitGame()
 {
-	Character = new GameObject("Character", "./ressources/BasicCriypticman.obj");
-	Character->Position = glm::vec3(3.0, 0.0, 0.0);
+	// Character = new GameObject("Character", "./ressources/BasicCriypticman.obj");
+	// Character->Position = glm::vec3(3.0, 0.0, 0.0);
 
-	// teapot = new GameObject("Teapot", "./ressources/teapot2.obj");
-	// teapot->Position.x = -4.0;
-	// teapot->Scale = glm::vec3(4.0, 4.0, 4.0);
+	// // teapot = new GameObject("Teapot", "./ressources/teapot2.obj");
+	// // teapot->Position.x = -4.0;
+	// // teapot->Scale = glm::vec3(4.0, 4.0, 4.0);
 
 	BasicWall = new GameObject("BasicWall", "./ressources/BasicWall.obj");
 	BasicWall->Position = glm::vec3(1.0, 0.0, 0.0);
 
+	HelloText = new GameTextObject("Hello");
+	HelloText->Position = glm::vec3(0.0, 0.0, 0.0);
+	HelloText->Color = glm::vec3(1.0, 1.0, 1.0);
 }
 
 // --------------------------------------------------------------------	//
@@ -42,8 +45,8 @@ void	GamePlayController::InitGame()
 
 void	GamePlayController::Update()
 {
-	Character->Rotation.y += 0.001;
-	Character->Position.z += 0.02;
+	// Character->Rotation.y += 0.001;
+	// Character->Position.z += 0.02;
 	BasicWall->Rotation.y += 0.003;
 }
 

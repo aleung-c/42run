@@ -34,6 +34,7 @@
 # include <random>
 # include <algorithm>
 # include <math.h>
+# include <map>
 
 // opengl includes
 # include "X.h"
@@ -63,6 +64,9 @@
 #  include <GL/glu.h>
 #  include <GL/glew.h>
 # endif
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 // Defines
 
@@ -99,13 +103,26 @@ typedef struct						s_bmp_texture
 	unsigned char					*data;
 }									t_bmp_texture;
 
+/*
+**	Freetype character helper struct.
+*/
+
+struct Character {
+    GLuint			TextureID;  // ID handle of the glyph texture
+    glm::ivec2		Size;       // Size of glyph
+    glm::ivec2		Bearing;    // Offset from baseline to left/top of glyph
+    GLuint			Advance;    // Offset to advance to next glyph
+};
+
 
 class				GameObject;
+class				GameTextObject;
 class				GameEngineController;
 class				GamePlayController;
 class				GlobalGameController;
 
 # include "GameObject.hpp"
+# include "GameTextObject.hpp"
 # include "GameEngineController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"

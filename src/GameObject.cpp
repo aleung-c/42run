@@ -113,7 +113,7 @@ void		GameObject::SetBuffers()
 	//	VBOs - Vertex buffer object												  //
 	// -------------------------------------------------------------------------- //
 
-	// generating buffer of face vertices.
+	// generating buffer of face vertices -> the one used to draw.
 	_fvbo = 0;
 	glGenBuffers(1, &(_fvbo));
 
@@ -123,7 +123,7 @@ void		GameObject::SetBuffers()
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
-	// generating vbo buffers
+	// generating vbo buffers -> useless in truth, but we never know.
 	std::cout << "vertices nb : " << _objVertices.size() << std::endl;
 	_vbo = 0;
 	glGenBuffers(1, &(_vbo));
@@ -175,15 +175,12 @@ void		GameObject::LoadTexture()
 	std::string texPath = ObjPath;
 	texPath.resize(ObjPath.size() - 4);
 	texPath.append(".bmp", 4);
-	std::cout << "supposed texture path = " << texPath << std::endl;
 	if ((LoadTextureFile(&_objTexture, texPath)) == -1)
 	{
-		std::cout << "No Texture for file" << std::endl;
 		HasTexture = false;
 		return ;
 	}
 	HasTexture = true;
-	std::cout << "Texture Loaded!" << std::endl;
 	glGenTextures(1, &_ObjTextureID);
 }
 
@@ -199,13 +196,8 @@ t_bmp_texture		&GameObject::GetTexture()
 
 void		GameObject::DrawObject()
 {
-	//std::cout << "vertices nb : " << _objVertices.size() << std::endl;
-	// glEnableVertexAttribArray(1);
-	// glEnableVertexAttribArray(2);
-	// glEnableVertexAttribArray(3);
 	if (HasModel == true)
 	{
-
 		// ------ load the uvs for the object - LOCATION = 1
 		glBindBuffer(GL_ARRAY_BUFFER, _fubo);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -226,7 +218,5 @@ void		GameObject::DrawObject()
 		// ----- disable all after draw;
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
-		// glDisableVertexAttribArray(2);
-		// glDisableVertexAttribArray(3);
 	}
 }
