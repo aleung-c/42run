@@ -18,6 +18,8 @@
 GameObject::GameObject(std::string objName)
 {
 	HasModel = false;
+	HasTexture = false;
+	ObjPath = "";
 	Name = objName;
 	InitValues();
 
@@ -42,11 +44,22 @@ GameObject::GameObject(std::string objName, std::string path)
 		return ;
 	}
 	Name = objName;
+	ObjPath = path;
 	HasModel = true;
+	// set initial values to zero.
 	InitValues();
+	// Parse the obj file to scoop values.
 	GetObjValues(file);
+	// set bounding box center -> object math center.
+	BoundingBoxCenter.x = (BoundingBoxMin.x + BoundingBoxMax.x) / 2;
+	BoundingBoxCenter.y = (BoundingBoxMin.y + BoundingBoxMax.y) / 2;
+	BoundingBoxCenter.z = (BoundingBoxMin.z + BoundingBoxMax.z) / 2;
+	// create faces from indexes.
+	CreateObjFaces();
+	// set opengl buffers
 	SetBuffers();
-	// TODO: load textures.
+	// load texture.
+	LoadTexture();
 	// Add this object to the engine's list of objects.
 	GameEngineController::Instance().GameObjectList.push_back(this);
 }
@@ -63,66 +76,28 @@ void		GameObject::InitValues()
 	BoundingBoxCenter = glm::vec3(0.0, 0.0, 0.0);
 }
 
-/*
-** The loader for our obj files.
-*/
 
-void		GameObject::GetObjValues(FILE *file)
-{
-	while (1)
-	{
-		char lineHeader[128];
-		// read the first word of the line
-		int res = fscanf(file, "%s", lineHeader);
-		if (res == EOF)
-			break ;
-		else
-		{
-			if (strncmp(lineHeader, "v", 10) == 0)
-			{
-				glm::vec4	vertex;
-				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-				vertex.w = 1.0;
-				_objVertices.push_back(vertex);
-			}
-			else if (strncmp(lineHeader, "vt", 10) == 0)
-			{
-				glm::vec2	uv;
-				fscanf(file, "%f %f\n", &uv.x, &uv.y );
-				_objUVs.push_back(uv);
-			}
-			else if (strcmp( lineHeader, "vn") == 0)
-			{
-				glm::vec3	normal;
-				fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
-				_objNormals.push_back(normal);
-			}
-			// else if ( strcmp( lineHeader, "f" ) == 0 )
-			// {
-			// 	std::string		vertex1, vertex2, vertex3;
-			// 	unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			// 	int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
-			// 	if (matches != 9){
-			// 		printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-			// 		return false;
-			// 	}
-			// 	vertexIndices.push_back(vertexIndex[0]);
-			// 	vertexIndices.push_back(vertexIndex[1]);
-			// 	vertexIndices.push_back(vertexIndex[2]);
-			// 	uvIndices.push_back(uvIndex[0]);
-			// 	uvIndices.push_back(uvIndex[1]);
-			// 	uvIndices.push_back(uvIndex[2]);
-			// 	normalIndices.push_back(normalIndex[0]);
-			// 	normalIndices.push_back(normalIndex[1]);
-			// 	normalIndices.push_back(normalIndex[2]);
-			// }
-		}
-	}
-}
 
 GameObject::~GameObject()
 {
 
+}
+
+void	GameObject::CreateObjFaces()
+{
+	int i = 0;
+
+	while (i != (int)_objVertexIndices.size())
+	{
+		_objFacesVertices.push_back(_objVertices[_objVertexIndices[i] - 1]);
+		i++;
+	}
+	i = 0;
+	while (i != (int)_objUVIndices.size())
+	{
+		_objFacesUVs.push_back(_objUVs[_objUVIndices[i] - 1]);
+		i++;
+	}
 }
 
 void		GameObject::SetBuffers()
@@ -178,15 +153,48 @@ void		GameObject::SetBuffers()
 	// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	// glEnableVertexAttribArray(2);
 
-	// the uv buffer.
-	_ubo = 0;
-	glGenBuffers(1, &(_ubo));
+	// the faces uv buffer. -> stocking the uvs not coming from the "f" header has no utility.
+	_fubo = 0;
+	glGenBuffers(1, &(_fubo));
 
-	glBindBuffer(GL_ARRAY_BUFFER, _ubo);
-	glBufferData(GL_ARRAY_BUFFER, _objUVs.size() * sizeof(glm::vec2), &_objUVs[0],
+	glBindBuffer(GL_ARRAY_BUFFER, _fubo);
+	glBufferData(GL_ARRAY_BUFFER, _objFacesUVs.size() * sizeof(glm::vec2), &_objFacesUVs[0],
 					GL_STATIC_DRAW);
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+}
+
+/*
+**	Once the buffer and faces are set, ill load the texture in memory.
+**	Ill assume the texture is in the same directory as the .obj, with the same
+**	name, and with the .bmp extension.
+*/
+
+void		GameObject::LoadTexture()
+{
+	std::string texPath = ObjPath;
+	texPath.resize(ObjPath.size() - 4);
+	texPath.append(".bmp", 4);
+	std::cout << "supposed texture path = " << texPath << std::endl;
+	if ((LoadTextureFile(&_objTexture, texPath)) == -1)
+	{
+		std::cout << "No Texture for file" << std::endl;
+		HasTexture = false;
+		return ;
+	}
+	HasTexture = true;
+	std::cout << "Texture Loaded!" << std::endl;
+	glGenTextures(1, &_ObjTextureID);
+}
+
+GLuint		GameObject::GetTextureID()
+{
+	return (_ObjTextureID);
+}
+
+t_bmp_texture		&GameObject::GetTexture()
+{
+	return (_objTexture);
 }
 
 void		GameObject::DrawObject()
@@ -197,13 +205,27 @@ void		GameObject::DrawObject()
 	// glEnableVertexAttribArray(3);
 	if (HasModel == true)
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+
+		// ------ load the uvs for the object - LOCATION = 1
+		glBindBuffer(GL_ARRAY_BUFFER, _fubo);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+		glEnableVertexAttribArray(1);
+
+		// ------ load vertex and draw them - LOCATION = 0
+		// ------ To display only points from vertex
+		// glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		// glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		// glEnableVertexAttribArray(0);
+		// glDrawArrays (GL_POINTS, 0, _objVertices.size());
+		// ------ To display triangles from faces vertex
+		glBindBuffer(GL_ARRAY_BUFFER, _fvbo);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		glEnableVertexAttribArray(0);
-		glDrawArrays (GL_POINTS, 0, _objVertices.size());
+		glDrawArrays(GL_TRIANGLES, 0, _objFacesVertices.size());
 
+		// ----- disable all after draw;
 		glDisableVertexAttribArray(0);
-		// glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(1);
 		// glDisableVertexAttribArray(2);
 		// glDisableVertexAttribArray(3);
 	}

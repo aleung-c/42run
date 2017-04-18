@@ -29,7 +29,10 @@ void	GlobalGameController::CheckForOpenGLError()
 	if (isLinked == GL_FALSE)
 		printf(KRED "Error: Shader programme NOT linked%s\n", KRESET);
 	else
+	{
 		printf(KGRN "Shader programme linked%s\n", KRESET);
+		return ;
+	}
 
 	// check for opengl errors.
 	GLenum err = GL_NO_ERROR;
@@ -42,13 +45,13 @@ void	GlobalGameController::CheckForOpenGLError()
 
 void	GlobalGameController::MainLoop()
 {	
+	CheckForOpenGLError();
 	while (!glfwWindowShouldClose(GameEngine->Window))
 	{
 		glfwPollEvents();
 		// catch events
 		Game.Update();
-		GameEngine->DrawObjects();
-		glfwSwapBuffers(GameEngine->Window);
+		GameEngine->Draw();
 		Game.LateUpdate();
 	}
 }

@@ -83,6 +83,23 @@ typedef struct		s_GameDatas
 	
 }					t_GameDatas;
 
+/*
+**	BMP helper struct
+*/
+
+typedef struct						s_bmp_texture
+{
+	// Data read from the header of the BMP file
+	unsigned char					header[54]; // Each BMP file begins by a 54-bytes header
+	unsigned int					data_pos;     // Position in the file where the actual data begins
+	unsigned int					width;
+	unsigned int					height;
+	unsigned int					image_size;   // = width*height*3
+	// Actual RGB data
+	unsigned char					*data;
+}									t_bmp_texture;
+
+
 class				GameObject;
 class				GameEngineController;
 class				GamePlayController;

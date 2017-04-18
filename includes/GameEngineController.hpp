@@ -72,7 +72,8 @@ class GameEngineController
 		void			LoadMatrices();
 
 		void			ApplyMatricesToObject(GameObject *Object);
-		void			DrawObjects();
+		void			LoadObjectTexture(GameObject *Object);
+		void			Draw();
 
 	private:
 		static GameEngineController m_instance;

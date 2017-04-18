@@ -6,6 +6,8 @@ class GamePlayController
 	public:
 		GameObject					*Character;
 		GameObject					*teapot;
+		GameObject					*BasicWall;
+
 		std::vector<GameObject *>	WorldObjects;
 
 		GamePlayController();
