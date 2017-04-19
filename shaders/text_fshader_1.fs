@@ -16,7 +16,11 @@ void main()
 	}
 	else
 	{
-		vec4 texel = texture(text, TexCoords);
+		// on UI elems, the Y on the texture is reversed. We correct it here.
+		vec2 reverse_coords = TexCoords;
+		reverse_coords.y *= -1.0;
+
+		vec4 texel = texture(text, reverse_coords);
 		frag_colour = texel;
 	}
 }
