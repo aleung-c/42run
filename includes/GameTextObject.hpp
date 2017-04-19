@@ -6,9 +6,10 @@
 class GameTextObject
 {
 	public:
-		GameTextObject(std::string text);
+		GameTextObject(std::string name, std::string text);
 		~GameTextObject();
 
+		std::string						Name;
 		std::string						Text;
 		glm::vec3						Color;
 

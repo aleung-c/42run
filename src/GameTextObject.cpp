@@ -7,8 +7,9 @@
 //	way as a 3d model.													//
 // --------------------------------------------------------------------	//
 
-GameTextObject::GameTextObject(std::string text)
+GameTextObject::GameTextObject(std::string name, std::string text)
 {
+	Name = name;
 	Text = text;
 	InitValues();
 	SetBuffers();

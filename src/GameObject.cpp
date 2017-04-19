@@ -175,7 +175,7 @@ void		GameObject::LoadTexture()
 	std::string texPath = ObjPath;
 	texPath.resize(ObjPath.size() - 4);
 	texPath.append(".bmp", 4);
-	if ((LoadTextureFile(&_objTexture, texPath)) == -1)
+	if ((GameEngineController::LoadTextureFile(&_objTexture, texPath)) == -1)
 	{
 		HasTexture = false;
 		return ;

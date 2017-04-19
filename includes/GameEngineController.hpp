@@ -18,12 +18,14 @@ class GameEngineController
 
 		GLFWwindow							*Window;
 
-
+		// ------ Engine's objects handling ------
 		std::vector<GameObject *>			GameObjectList;
 		std::vector<GameTextObject *>		GameTextObjectList;
+		std::vector<GameUIObject	*>		GameUIObjectList;
 
 		GameObject							*MainCamera;
 
+		// ------ Shaders handling ------
 		char								*VertexShader_1;
 		char								*FragmentShader_1;
 
@@ -33,72 +35,78 @@ class GameEngineController
 		GLuint								MainShaderProgramme;
 		GLuint								TextShaderProgramme;
 
-		// matrix handling
-		// model
-		glm::mat4							BaseMatModelIdentity;
-		glm::mat4							BaseMatModelTranslation;
-		glm::mat4							BaseMatModelRotation;
-		glm::mat4							BaseMatModelScaling;
-
+		// ------ Matrix handling ------
+		// Model
 		glm::mat4							MatModelIdentity;
 		glm::mat4							MatModelTranslation;
 		glm::mat4							MatModelRotation;
 		glm::mat4							MatModelScaling;
-		// float								matrix_x_rotation[4][4];
-		// float								matrix_y_rotation[4][4];
-		// float								matrix_z_rotation[4][4];
 
-		// view -> camera
+		// View -> camera
 		float								CameraNear;
 		float								CameraFar;
 		float								CameraFov;
 		float								CameraAspect;
 
-		// projection -> persp or ortho
+		// Projection -> persp or ortho
 		glm::mat4							MatPerspectiveProjection;
 		glm::mat4							MatOrthographicProjection;
 
+		// Matrices merge
 		glm::mat4							MatModel;
 		glm::mat4							MatView;
 
 		glm::mat4							MatMVP;
 
-		// fonts
+		// ------ Freetype lib fonts ------
 		FT_Library							FT_Lib;
 		FT_Face								Face;
 
 		// map of asciis 128 characters.
 		std::map<GLchar, Character>			Characters;
 
+
 		GameEngineController();
 		~GameEngineController();
-	
-		// class methods
-		void			InitEngine();
+
+		void								InitEngine();
 		
-		int				InitGLFW();
-		int				InitOpenGL();
-		int				InitFreeType();
-		void			LoadFreeTypesCharacters();
+		int									InitGLFW();
+		int									InitOpenGL();
+		int									InitFreeType();
+		void								LoadFreeTypesCharacters();
 
-		void			LoadShaders();
-		char			*GetFileContent(std::string file_path);
+		void								LoadShaders();
 
-		void			LoadMatrices();
+		static char							*GetFileContent(std::string file_path);
+		static int							LoadTextureFile(t_bmp_texture *texture, std::string path);
 
-		void			ApplyMatricesToObject(GameObject *Object);
-		void			LoadObjectTexture(GameObject *Object);
-		void			RenderText(GameTextObject *obj);
+		void								LoadMatrices();
+		void								ApplyMatricesToObject(GameObject *Object);
+		void								LoadObjectTexture(GameObject *Object);
+		void								RenderText(GameTextObject *obj);
 
-		void			Draw();
-		void			DrawTextObjects();
-		void			Draw3DModels();
+		void								Draw();
+		void								Draw3DModels();
+		void								DrawUIObjects();
+		void								DrawTextObjects();
+
+		void								RenderUIObject(GameUIObject *obj);
 
 
 
 
 	private:
 		static GameEngineController m_instance;
+
+		// ------ Font tmp vars ------
+		int									tmp_x;
+		int									tmp_y;
+		Character							ch;
+		GLfloat								xpos;
+		GLfloat								ypos;
+		GLfloat								w;
+		GLfloat								h;
 };
 
 #endif

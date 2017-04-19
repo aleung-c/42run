@@ -33,7 +33,6 @@ class GameObject
 		void							CreateObjFaces();
 		void							SetBuffers();
 		void							LoadTexture();
-		int								LoadTextureFile(t_bmp_texture *texture, std::string path);
 		GLuint							GetTextureID();
 		t_bmp_texture					&GetTexture();
 

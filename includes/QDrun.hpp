@@ -117,12 +117,14 @@ struct Character {
 
 class				GameObject;
 class				GameTextObject;
+class				GameUIObject;
 class				GameEngineController;
 class				GamePlayController;
 class				GlobalGameController;
 
 # include "GameObject.hpp"
 # include "GameTextObject.hpp"
+# include "GameUIObject.hpp"
 # include "GameEngineController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"

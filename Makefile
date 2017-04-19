@@ -9,8 +9,13 @@ NAME = 42run
 SRC = ./src/main.cpp \
 ./src/GameObject.cpp \
 ./src/GameObject_Parsing.cpp \
+./src/GameUIObject.cpp \
 ./src/GameTextObject.cpp \
 ./src/GameEngineController.cpp \
+./src/GameEngineController_freetype_font.cpp \
+./src/GameEngineController_parsing.cpp \
+./src/GameEngineController_shaders.cpp \
+./src/GameEngineController_UI.cpp \
 ./src/GamePlayController.cpp \
 ./src/GlobalGameController.cpp
 
