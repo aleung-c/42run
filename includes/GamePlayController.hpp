@@ -16,15 +16,22 @@ class GamePlayController
 
 		std::vector<GameObject *>	WorldObjects;
 
+		// Game Rule values
+		float						WorldSpeed;
+		float						MaxWorldX;
+		float						MinWorldX;
+
 		GamePlayController();
 		~GamePlayController();
 
 		void	InitGame();
 
-		// loop functions
+		// Loop functions
 		void	Update();
 		void	LateUpdate();
-	
+
+		// Event methods
+		void	KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 #endif

@@ -55,7 +55,7 @@ void	GamePlayController::InitGame()
 void	GamePlayController::Update()
 {
 	Character->Rotation.y += 0.001;
-	Character->Position.z += 0.02;
+	Character->Position.z += 0.001;
 	BasicWall->Rotation.y += 0.003;
 }
 
@@ -65,5 +65,21 @@ void	GamePlayController::Update()
 
 void	GamePlayController::LateUpdate()
 {
+
+}
+
+// --------------------------------------------------------------------	//
+//																		//
+//	Gameplay event handling												//
+//																		//
+// --------------------------------------------------------------------	//
+
+void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	(void)window;
+	(void)key;
+	(void)scancode;
+	(void)action;
+	(void)mods;
 
 }
