@@ -26,7 +26,7 @@ GLFW = -framework Cocoa -framework CoreVideo -framework IOKit -framework GLUT -L
 FREETYPE2_L = -L./freetype-2.4.0/objs -lfreetype
 FREETYPE2_I = -I./freetype-2.4.0/include
 
-all: $(NAME)
+all: freetype $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) -o $(NAME) $(OBJ) $(GL) $(GLFW) $(FREETYPE2_L)
@@ -34,8 +34,12 @@ $(NAME): $(OBJ)
 %.o: %.cpp
 	$(CC) -o $@ -c $<
 
+freetype :
+	make -C ./freetype-2.4.0/
+
 clean:
 	rm -rf $(OBJ)
+	make clean -C ./freetype-2.4.0/
 
 fclean: clean
 	rm -rf $(NAME)
