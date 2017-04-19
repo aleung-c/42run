@@ -31,6 +31,10 @@ void	GamePlayController::InitGame()
 	HelloText = new GameTextObject("Hello");
 	HelloText->Position = glm::vec3(0.0, 0.0, 0.0);
 	HelloText->Color = glm::vec3(1.0, 1.0, 1.0);
+
+	HelloText2 = new GameTextObject("Hello2pgbcvl");
+	HelloText2->Position = glm::vec3(100.0, 70.0, 0.0);
+	HelloText2->Color = glm::vec3(1.0, 1.0, 1.0);
 }
 
 // --------------------------------------------------------------------	//

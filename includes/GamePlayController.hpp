@@ -9,6 +9,7 @@ class GamePlayController
 		GameObject					*BasicWall;
 
 		GameTextObject				*HelloText;
+		GameTextObject				*HelloText2;
 
 		std::vector<GameObject *>	WorldObjects;
 

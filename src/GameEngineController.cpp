@@ -274,11 +274,6 @@ void	GameEngineController::LoadMatrices()
 	MatPerspectiveProjection = glm::perspective(CameraFov, CameraAspect, CameraNear, CameraFar);
 
 	MatOrthographicProjection = glm::ortho(0.0f, (float)WINDOW_WIDTH, 0.0f, (float)WINDOW_HEIGHT);
-	GLint uniform_mat = glGetUniformLocation(TextShaderProgramme, "projection_matrix");
-	if (uniform_mat != -1)
-	{
-		glUniformMatrix4fv(uniform_mat, 1, GL_FALSE, &MatOrthographicProjection[0][0]);
-	}
 }
 
 /*
@@ -358,9 +353,15 @@ void	GameEngineController::LoadObjectTexture(GameObject *Object)
 
 void	GameEngineController::RenderText(GameTextObject *obj)
 {
+	GLint uniform_mat = glGetUniformLocation(TextShaderProgramme, "projection_matrix");
+	if (uniform_mat != -1)
+	{
+		glUniformMatrix4fv(uniform_mat, 1, GL_FALSE, &MatOrthographicProjection[0][0]);
+	}
+	
 	glUniform3f(glGetUniformLocation(TextShaderProgramme, "textColor"),
 		obj->Color.x, obj->Color.y, obj->Color.z);
-	glActiveTexture(GL_TEXTURE0);
+	// glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(obj->GetVao());
 
 	int tmp_x = obj->Position.x;
@@ -396,7 +397,8 @@ void	GameEngineController::RenderText(GameTextObject *obj)
 		// glUniform1i(uniform_mat, 0);
 		// Update content of VBO memory
 		glBindBuffer(GL_ARRAY_BUFFER, obj->GetVbo());
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); 
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		// glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, &vertices[0][0], GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		glEnableVertexAttribArray(0);
 		// glBindBuffer(GL_ARRAY_BUFFER, 0);
