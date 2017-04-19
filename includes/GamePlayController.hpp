@@ -11,6 +11,8 @@ class GamePlayController
 		GameTextObject				*HelloText;
 		GameTextObject				*HelloText2;
 		GameUIObject				*UIElem;
+		GameUIObject				*UIElem2;
+
 
 		std::vector<GameObject *>	WorldObjects;
 

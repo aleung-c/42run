@@ -248,6 +248,7 @@ void	GameEngineController::DrawUIObjects()
 	GLint uniform_mat = glGetUniformLocation(TextShaderProgramme, "projection_matrix");
 	if (uniform_mat != -1)
 		glUniformMatrix4fv(uniform_mat, 1, GL_FALSE, &MatOrthographicProjection[0][0]);
+	glUniform1i(glGetUniformLocation(TextShaderProgramme, "IsText"), GL_FALSE);
 	for (std::vector<GameUIObject *>::iterator it = GameUIObjectList.begin();
 		it != GameUIObjectList.end();
 		it++)
@@ -269,6 +270,7 @@ void	GameEngineController::DrawTextObjects()
 	GLint uniform_mat = glGetUniformLocation(TextShaderProgramme, "projection_matrix");
 	if (uniform_mat != -1)
 		glUniformMatrix4fv(uniform_mat, 1, GL_FALSE, &MatOrthographicProjection[0][0]);
+	glUniform1i(glGetUniformLocation(TextShaderProgramme, "IsText"), GL_TRUE);
 	for (std::vector<GameTextObject *>::iterator it = GameTextObjectList.begin();
 		it != GameTextObjectList.end();
 		it++)

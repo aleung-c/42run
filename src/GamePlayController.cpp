@@ -37,6 +37,9 @@ void	GamePlayController::InitGame()
 	HelloText2->Color = glm::vec3(1.0, 1.0, 1.0);
 
 	UIElem = new GameUIObject("UIELEM1", "./ressources/UI_Elem_1.bmp");
+	UIElem->Position = glm::vec3(200.0, 120.0, 0.0);
+	// UIElem2 = new GameUIObject("UIELEM2", "./ressources/UI_Elem_1.bmp");
+	// UIElem2->Position = glm::vec3(600.0, 120.0, 0.0);
 }
 
 // --------------------------------------------------------------------	//
