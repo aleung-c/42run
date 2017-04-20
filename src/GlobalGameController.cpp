@@ -25,7 +25,7 @@ void	GlobalGameController::CheckForOpenGLError()
 {
 	int error = 0;
 
-	// check if shader is compiled and linked;
+	// check if main 3d perspective shader is compiled and linked;
 	GLint isLinked = 0;
 	glGetProgramiv(GameEngine->MainShaderProgramme, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE)
@@ -34,11 +34,8 @@ void	GlobalGameController::CheckForOpenGLError()
 		error = -1;
 	}
 	else
-	{
 		printf(KGRN "Main Shader programme linked%s\n", KRESET);
-	}
-
-	// check if shader is compiled and linked;
+	// check if ortho shader is compiled and linked;
 	isLinked = 0;
 	glGetProgramiv(GameEngine->TextShaderProgramme, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE)
@@ -47,20 +44,14 @@ void	GlobalGameController::CheckForOpenGLError()
 		error = -1;
 	}
 	else
-	{
 		printf(KGRN "Text Shader programme linked%s\n", KRESET);
-	}
 	if (error == 0)
-	{
 		return ;
-	}
 
 	// check for opengl errors.
 	GLenum err = GL_NO_ERROR;
-	while((err = glGetError()) != GL_NO_ERROR)
-	{
+	while ((err = glGetError()) != GL_NO_ERROR)
 		printf(KRED "OpenGL Error: %u%s\n", err, KRESET);
-	}
 	exit (-1);
 }
 

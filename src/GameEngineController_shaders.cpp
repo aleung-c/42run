@@ -32,8 +32,8 @@ void	GameEngineController::LoadShaders()
 	// -------------------------------------------------------------------------- //
 	//	Text Shaders															  //
 	// -------------------------------------------------------------------------- //
-	TextVShader = GetFileContent("./shaders/text_vshader_1.vs");
-	TextFShader = GetFileContent("./shaders/text_fshader_1.fs");
+	TextVShader = GetFileContent("./shaders/ortho_vshader_1.vs");
+	TextFShader = GetFileContent("./shaders/ortho_fshader_1.fs");
 
 	// Create shader programme
 	GLuint vs2 = glCreateShader(GL_VERTEX_SHADER);

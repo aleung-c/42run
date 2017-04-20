@@ -40,7 +40,6 @@
 # include "X.h"
 # include <ctype.h>
 # include <regex.h>
-# include <math.h>
 
 // lib GML
 # include "../glm/glm/glm.hpp"
@@ -74,20 +73,6 @@
 # define WINDOW_HEIGHT 720
 
 /*
-**	
-*/
-
-
-/*
-**	Global 42run struct
-*/
-
-typedef struct		s_GameDatas
-{
-	
-}					t_GameDatas;
-
-/*
 **	BMP helper struct
 */
 
@@ -108,10 +93,10 @@ typedef struct						s_bmp_texture
 */
 
 struct Character {
-    GLuint			TextureID;  // ID handle of the glyph texture
-    glm::ivec2		Size;       // Size of glyph
-    glm::ivec2		Bearing;    // Offset from baseline to left/top of glyph
-    GLuint			Advance;    // Offset to advance to next glyph
+	GLuint			TextureID;  // ID handle of the glyph texture
+	glm::ivec2		Size;       // Size of glyph
+	glm::ivec2		Bearing;    // Offset from baseline to left/top of glyph
+	GLuint			Advance;    // Offset to advance to next glyph
 };
 
 
