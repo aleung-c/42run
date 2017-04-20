@@ -37,80 +37,47 @@
 # include <map>
 
 // opengl includes
-# include "X.h"
+// # include "X.h"
 # include <ctype.h>
 # include <regex.h>
 
-// lib GML
-# include "../glm/glm/glm.hpp"
-# include "../glm/glm/gtc/matrix_transform.hpp"
+#include "../aleung-c_engine/includes/aleung-c_engine.hpp"
 
-// linking GLFW
-# include "../glfw-3.2.1/include/GLFW/glfw3.h"
+// // lib GML
+// # include "../glm/glm/glm.hpp"
+// # include "../glm/glm/gtc/matrix_transform.hpp"
+
+// // linking GLFW
+// # include "../glfw-3.2.1/include/GLFW/glfw3.h"
 
 // Linking OpenGL
-# if defined(__APPLE__)
-#  define __gl_h_
-#  define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
-#  include <OpenGL/gl3.h>
-#  include <OpenGL/gl3ext.h>
-#  include <OpenGL/glu.h>
-#  include <GLUT/glut.h>
+// # if defined(__APPLE__)
+// #  define __gl_h_
+// #  define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+// #  include <OpenGL/gl3.h>
+// #  include <OpenGL/gl3ext.h>
+// #  include <OpenGL/glu.h>
+// #  include <GLUT/glut.h>
 
-# else
-#  include <GL/gl3.h>
- // #  include <GL/gl.h>
-#  include <GL/glu.h>
-#  include <GL/glew.h>
-# endif
+// # else
+// #  include <GL/gl3.h>
+//  // #  include <GL/gl.h>
+// #  include <GL/glu.h>
+// #  include <GL/glew.h>
+// // # endif
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+// #include <ft2build.h>
+// #include FT_FREETYPE_H
 
 // Defines
 
 # define WINDOW_WIDTH 1280
 # define WINDOW_HEIGHT 720
+# define WINDOW_NAME "aleung-c's 42run"
 
-/*
-**	BMP helper struct
-*/
-
-typedef struct						s_bmp_texture
-{
-	// Data read from the header of the BMP file
-	unsigned char					header[54]; // Each BMP file begins by a 54-bytes header
-	unsigned int					data_pos;     // Position in the file where the actual data begins
-	unsigned int					width;
-	unsigned int					height;
-	unsigned int					image_size;   // = width*height*3
-	// Actual RGB data
-	unsigned char					*data;
-}									t_bmp_texture;
-
-/*
-**	Freetype character helper struct.
-*/
-
-struct Character {
-	GLuint			TextureID;  // ID handle of the glyph texture
-	glm::ivec2		Size;       // Size of glyph
-	glm::ivec2		Bearing;    // Offset from baseline to left/top of glyph
-	GLuint			Advance;    // Offset to advance to next glyph
-};
-
-
-class				GameObject;
-class				GameTextObject;
-class				GameUIObject;
-class				GameEngineController;
 class				GamePlayController;
 class				GlobalGameController;
 
-# include "GameObject.hpp"
-# include "GameTextObject.hpp"
-# include "GameUIObject.hpp"
-# include "GameEngineController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"
 

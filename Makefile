@@ -7,47 +7,42 @@
 NAME = 42run
 
 SRC = ./src/main.cpp \
-./src/GameObject.cpp \
-./src/GameObject_Parsing.cpp \
-./src/GameUIObject.cpp \
-./src/GameTextObject.cpp \
-./src/GameEngineController.cpp \
-./src/GameEngineController_freetype_font.cpp \
-./src/GameEngineController_parsing.cpp \
-./src/GameEngineController_shaders.cpp \
-./src/GameEngineController_UI.cpp \
 ./src/GamePlayController.cpp \
 ./src/GlobalGameController.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
-CC = clang++ -g -Wall -Werror -Wextra $(FREETYPE2_I)
+CC = clang++ -g -Wall -Werror -Wextra $(FREETYPE2_I) 
 
 # Linking opengl and lib GLFW.
 GL = -framework OpenGL
-GLFW = -framework Cocoa -framework CoreVideo -framework IOKit -framework GLUT -L./glfw-3.2.1/src -lglfw3
+GLFW = -framework Cocoa -framework CoreVideo -framework IOKit -framework GLUT -L./aleung-c_engine/glfw-3.2.1/src -lglfw3
 
 # For freetype true font loading library
-FREETYPE2_L = -L./freetype-2.4.0/objs -lfreetype
-FREETYPE2_I = -I./freetype-2.4.0/include
+FREETYPE2_L = -L./aleung-c_engine/freetype-2.4.0/objs -lfreetype
+FREETYPE2_I = -I./aleung-c_engine/freetype-2.4.0/include
 
-all: freetype $(NAME)
+ENGINE_DIR = ./aleung-c_engine/
+ENGINE_L = -L./aleung-c_engine/ -laleung-c_engine
+
+all: engine $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(GL) $(GLFW) $(FREETYPE2_L)
+	$(CC) -o $(NAME) $(OBJ) $(GL) $(GLFW) $(FREETYPE2_L) $(ENGINE_L)
+
+engine:
+	make -C $(ENGINE_DIR)
 
 %.o: %.cpp
 	$(CC) -o $@ -c $<
 
-freetype :
-	make -C ./freetype-2.4.0/
-
 clean:
 	rm -rf $(OBJ)
-	make clean -C ./freetype-2.4.0/
+	make clean -C $(ENGINE_DIR)
 
 fclean: clean
 	rm -rf $(NAME)
+	make fclean -C $(ENGINE_DIR)
 
 re: fclean all
 
