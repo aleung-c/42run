@@ -14,6 +14,9 @@ class WorldController
 {
 	public:
 		float				WorldSpeed;
+		float				GameSpaceMax_X;
+		float				GameSpaceMin_X;
+
 
 		std::vector<GameObject *>	WorldObjects;
 

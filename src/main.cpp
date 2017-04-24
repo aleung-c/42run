@@ -1,6 +1,6 @@
 #include "../includes/QDrun.hpp"
 
-GameEngineController GameEngineController::m_instance = GameEngineController();
+GamePlayController GamePlayController::m_instance = GamePlayController();
 
 int		main(void)
 {

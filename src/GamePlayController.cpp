@@ -1,6 +1,7 @@
 # include "../includes/QDrun.hpp"
 
-GamePlayController::GamePlayController()
+GamePlayController::GamePlayController() : CurrentScene(MAIN_MENU),
+ButtonPressed(false)
 {
 
 }
@@ -8,6 +9,11 @@ GamePlayController::GamePlayController()
 GamePlayController::~GamePlayController()
 {
 
+}
+
+GamePlayController&		GamePlayController::Instance()
+{
+	return (GamePlayController::m_instance);
 }
 
 // --------------------------------------------------------------------	//
@@ -45,7 +51,10 @@ void	GamePlayController::InitGame()
 	CameraLookAtPos->x = 0.0;
 	CameraLookAtPos->y = 0.0;
 	CameraLookAtPos->z = 0.0;
+
+	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
 	World.SpawnInitialWorld();
+	lerpmu = 0.0;
 }
 
 // --------------------------------------------------------------------	//
@@ -60,12 +69,35 @@ void	GamePlayController::InitGame()
 
 void	GamePlayController::Update()
 {
-	World.UpdateWorld();
-	// CameraLookAtPos->x += 0.01;
 	// ----- DEBUG and showcase engine.
 	// Character->Rotation.y += 0.001;
 	// Character->Position.z += 0.001;
 	// BasicWall->Rotation.y += 0.003;
+
+	if (CurrentScene == MAIN_MENU)
+	{
+		if (ButtonPressed == true)
+		{
+			// transitionning to ingame;
+			if (MainMenuBackground->Position.x < 1280.0)
+			{
+				MainMenuBackground->Position.x = Tools::CubicInterpolation(MainMenuBackground->Position.x, 1280.0, lerpmu);
+				lerpmu += 0.005;
+			}
+			else
+			{
+				TransitionDone = true;
+				CurrentScene = IN_GAME;
+				std::cout << "Go to IN_GAME Scene" << std::endl;
+			}
+
+		}
+	}
+	else if (CurrentScene == IN_GAME)
+	{
+		World.UpdateWorld();
+	}
+
 }
 
 /*
@@ -83,6 +115,7 @@ void	GamePlayController::LateUpdate()
 //																		//
 // --------------------------------------------------------------------	//
 
+// This method is STATIC -> glfw constraint.
 void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	(void)window;
@@ -90,4 +123,10 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 	(void)scancode;
 	(void)action;
 	(void)mods;
+
+	 if (action == GLFW_PRESS)
+	 {
+	 	std::cout << "pressed any key!" << std::endl;
+	 	GamePlayController::Instance().ButtonPressed = true;
+	 }
 }

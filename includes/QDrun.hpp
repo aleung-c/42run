@@ -75,10 +75,18 @@
 # define WINDOW_HEIGHT 720
 # define WINDOW_NAME "aleung-c's 42run"
 
+typedef enum		e_GameScene
+{
+	MAIN_MENU,
+	IN_GAME
+}					t_GameScene;
+
+class				Tools;
 class				WorldController;
 class				GamePlayController;
 class				GlobalGameController;
 
+# include "Tools.hpp"
 # include "WorldController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"

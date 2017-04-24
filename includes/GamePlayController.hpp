@@ -13,29 +13,35 @@ class GamePlayController
 		// GameUIObject				*UIElem;
 		// GameUIObject				*UIElem2;
 
+		// lazy singleton for c langage key callback.
+		static GamePlayController&			Instance();
 
 		// Gameplay controller elements
+		t_GameScene					CurrentScene;
+
 		GameObject					*MainCamera;
 		glm::vec3					*CameraLookAtPos;
 		WorldController				World;
 
-
-		// Game Rule values
-		float						WorldSpeed;
-		float						MaxWorldX;
-		float						MinWorldX;
+		GameUIObject				*MainMenuBackground;
+		bool						ButtonPressed;
+		bool						TransitionDone;
+		float						lerpmu;
 
 		GamePlayController();
 		~GamePlayController();
 
-		void	InitGame();
+		void						InitGame();
 
 		// Loop functions
-		void	Update();
-		void	LateUpdate();
+		void						Update();
+		void						LateUpdate();
 
 		// Event methods
-		void	KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void					KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+	private:
+		static GamePlayController	m_instance;
 };
 
 #endif

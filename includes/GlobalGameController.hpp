@@ -13,7 +13,7 @@ class GlobalGameController
 {
 	public:
 		GameEngineController	*GameEngine;
-		GamePlayController		Game;
+		GamePlayController		&Game;
 
 		GameObject *Character;
 		GameObject *teapot;

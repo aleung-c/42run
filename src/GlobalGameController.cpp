@@ -1,6 +1,6 @@
 #include "../includes/QDrun.hpp"
 
-GlobalGameController::GlobalGameController()
+GlobalGameController::GlobalGameController() : Game(GamePlayController::Instance())
 {
 
 }
@@ -18,6 +18,7 @@ GlobalGameController::~GlobalGameController()
 void	GlobalGameController::InitGame()
 {
 	GameEngine->InitEngine(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME);
+	glfwSetKeyCallback(GameEngine->Window, &GamePlayController::KeyCallback);
 	Game.InitGame();
 }
 
