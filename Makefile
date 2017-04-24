@@ -7,6 +7,7 @@
 NAME = 42run
 
 SRC = ./src/main.cpp \
+./src/WorldController.cpp \
 ./src/GamePlayController.cpp \
 ./src/GlobalGameController.cpp
 

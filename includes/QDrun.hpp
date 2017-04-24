@@ -75,9 +75,11 @@
 # define WINDOW_HEIGHT 720
 # define WINDOW_NAME "aleung-c's 42run"
 
+class				WorldController;
 class				GamePlayController;
 class				GlobalGameController;
 
+# include "WorldController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"
 

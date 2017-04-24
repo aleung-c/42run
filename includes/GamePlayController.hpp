@@ -4,17 +4,21 @@
 class GamePlayController
 {
 	public:
-		GameObject					*Character;
-		GameObject					*teapot;
-		GameObject					*BasicWall;
+		// ----- DEBUG and showcase engine.
+		// GameObject					*Character;
+		// GameObject					*BasicWall;
 
-		GameTextObject				*HelloText;
-		GameTextObject				*HelloText2;
-		GameUIObject				*UIElem;
-		GameUIObject				*UIElem2;
+		// GameTextObject				*HelloText;
+		// GameTextObject				*HelloText2;
+		// GameUIObject				*UIElem;
+		// GameUIObject				*UIElem2;
 
 
-		std::vector<GameObject *>	WorldObjects;
+		// Gameplay controller elements
+		GameObject					*MainCamera;
+		glm::vec3					*CameraLookAtPos;
+		WorldController				World;
+
 
 		// Game Rule values
 		float						WorldSpeed;
