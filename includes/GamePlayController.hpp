@@ -23,6 +23,8 @@ class GamePlayController
 		glm::vec3					*CameraLookAtPos;
 		WorldController				World;
 
+		GameObject					*Character;
+
 		GameUIObject				*MainMenuBackground;
 		bool						ButtonPressed;
 		bool						TransitionDone;

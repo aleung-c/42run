@@ -44,10 +44,9 @@ void	WorldController::SpawnInitialWorld()
 	WorldObjects.push_back(WallRight);
 	WorldObjects.push_back(WallLeft);
 	WorldObjects.push_back(Chair);
-
 }
 
 void	WorldController::UpdateWorld()
 {
-
+	
 }

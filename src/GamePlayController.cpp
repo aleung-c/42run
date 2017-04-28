@@ -47,13 +47,15 @@ void	GamePlayController::InitGame()
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
 
-	MainCamera->Position = glm::vec3(0.0, 2.0, -10.0);
+	MainCamera->Position = glm::vec3(0.0, 4.0, -11.0);
 	CameraLookAtPos->x = 0.0;
 	CameraLookAtPos->y = 0.0;
 	CameraLookAtPos->z = 0.0;
 
 	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
 	World.SpawnInitialWorld();
+	Character = new GameObject("Character", "./ressources/models/character_idle.obj");
+	Character->Position = glm::vec3(3.0, 0.0, -7.0);
 	lerpmu = 0.0;
 }
 
@@ -128,5 +130,37 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 	 {
 	 	std::cout << "pressed any key!" << std::endl;
 	 	GamePlayController::Instance().ButtonPressed = true;
-	 }
+	 	if (GamePlayController::Instance().CurrentScene == IN_GAME)
+	 	{
+			// camera placement debug
+			if (key == GLFW_KEY_W)
+			{
+				GamePlayController::Instance().MainCamera->Position.z += 0.5f;
+			}
+			else if (key == GLFW_KEY_S)
+			{
+				GamePlayController::Instance().MainCamera->Position.z -= 0.5f;
+			}
+			else if (key == GLFW_KEY_A)
+			{
+				GamePlayController::Instance().MainCamera->Position.x += 0.5f;
+			}
+			else if (key == GLFW_KEY_D)
+			{
+				GamePlayController::Instance().MainCamera->Position.x -= 0.5f;
+			}
+			else if (key == GLFW_KEY_SPACE)
+			{
+				GamePlayController::Instance().MainCamera->Position.y += 0.5f;
+			}
+			else if (key == GLFW_KEY_C)
+			{
+				GamePlayController::Instance().MainCamera->Position.y -= 0.5f;
+			}
+			
+			std::cout << "Camera: " << GamePlayController::Instance().MainCamera->Position.x << "x "
+				<< GamePlayController::Instance().MainCamera->Position.y << "y "
+				<< GamePlayController::Instance().MainCamera->Position.z << "z" << std::endl;
+		}
+	}
 }
