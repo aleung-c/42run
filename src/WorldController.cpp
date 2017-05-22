@@ -29,6 +29,12 @@ void	WorldController::SpawnInitialWorld()
 	GameObject	*WallRight = new GameObject("GroundBlock", "./ressources/models/basic_wall_1.obj");
 	WallRight->Rotation.y += 90;
 	WallRight->Position.x = GameSpaceMin_X;
+
+	GameObject	*WallRight2 = new GameObject("GroundBlock", "./ressources/models/basic_wall_1.obj");
+	WallRight2->Rotation.y += 90;
+	WallRight2->Position.x = GameSpaceMin_X;
+	WallRight2->Position.z += 18.0;
+
 	GameObject	*WallLeft = new GameObject("GroundBlock", "./ressources/models/basic_wall_1.obj");
 	WallLeft->Rotation.y += 90;
 	WallLeft->Position.x = GameSpaceMax_X;
@@ -42,11 +48,12 @@ void	WorldController::SpawnInitialWorld()
 	WorldObjects.push_back(Ceiling);
 	WorldObjects.push_back(Desk);
 	WorldObjects.push_back(WallRight);
+	WorldObjects.push_back(WallRight2);
 	WorldObjects.push_back(WallLeft);
 	WorldObjects.push_back(Chair);
 }
 
 void	WorldController::UpdateWorld()
 {
-	
+	WorldObjects[2]->Rotation.y += 0.8; // desk.
 }
