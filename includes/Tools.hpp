@@ -6,7 +6,7 @@
 	class Tools
 	{
 		public:
-			static float	CubicInterpolation(float a, float b, float mu);
+			static float	LinearInterpolation(float a, float b, float mu);
 	};
 
 #endif

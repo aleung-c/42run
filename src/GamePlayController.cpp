@@ -47,15 +47,15 @@ void	GamePlayController::InitGame()
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
 
-	MainCamera->Position = glm::vec3(0.0, 4.0, -11.0);
+	MainCamera->Position = glm::vec3(0.0, 4.5, -10.5);
 	CameraLookAtPos->x = 0.0;
-	CameraLookAtPos->y = 0.0;
-	CameraLookAtPos->z = 0.0;
+	CameraLookAtPos->y = 1.0;
+	CameraLookAtPos->z = 8.0;
 
 	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
 	World.SpawnInitialWorld();
-	Character = new GameObject("Character", "./ressources/models/character_idle.obj");
-	Character->Position = glm::vec3(3.0, 0.0, -7.0);
+	
+	Character.InitCharacter(glm::vec3(3.0, 0.0, 0.0));
 	lerpmu = 0.0;
 }
 
@@ -83,12 +83,13 @@ void	GamePlayController::Update()
 			// transitionning to ingame;
 			if (MainMenuBackground->Position.x < 1280.0)
 			{
-				MainMenuBackground->Position.x = Tools::CubicInterpolation(MainMenuBackground->Position.x, 1280.0, lerpmu);
+				MainMenuBackground->Position.x = Tools::LinearInterpolation(MainMenuBackground->Position.x, 1280.0, lerpmu);
 				lerpmu += 0.005;
 			}
 			else
 			{
 				TransitionDone = true;
+				lerpmu = 0.0;
 				CurrentScene = IN_GAME;
 				std::cout << "Go to IN_GAME Scene" << std::endl;
 			}
@@ -98,8 +99,8 @@ void	GamePlayController::Update()
 	else if (CurrentScene == IN_GAME)
 	{
 		World.UpdateWorld();
+		Character.Update();
 	}
-
 }
 
 /*
@@ -118,49 +119,57 @@ void	GamePlayController::LateUpdate()
 // --------------------------------------------------------------------	//
 
 // This method is STATIC -> glfw constraint.
+// It forced me to make the GamePlayController a singleton instance...
 void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	(void)window;
-	(void)key;
-	(void)scancode;
-	(void)action;
-	(void)mods;
+	static GamePlayController	*GameInstance;
 
-	 if (action == GLFW_PRESS)
-	 {
-	 	std::cout << "pressed any key!" << std::endl;
-	 	GamePlayController::Instance().ButtonPressed = true;
-	 	if (GamePlayController::Instance().CurrentScene == IN_GAME)
-	 	{
-			// camera placement debug
-			if (key == GLFW_KEY_W)
-			{
-				GamePlayController::Instance().MainCamera->Position.z += 0.5f;
-			}
-			else if (key == GLFW_KEY_S)
-			{
-				GamePlayController::Instance().MainCamera->Position.z -= 0.5f;
-			}
-			else if (key == GLFW_KEY_A)
-			{
-				GamePlayController::Instance().MainCamera->Position.x += 0.5f;
-			}
-			else if (key == GLFW_KEY_D)
-			{
-				GamePlayController::Instance().MainCamera->Position.x -= 0.5f;
-			}
-			else if (key == GLFW_KEY_SPACE)
-			{
-				GamePlayController::Instance().MainCamera->Position.y += 0.5f;
-			}
-			else if (key == GLFW_KEY_C)
-			{
-				GamePlayController::Instance().MainCamera->Position.y -= 0.5f;
-			}
-			
-			std::cout << "Camera: " << GamePlayController::Instance().MainCamera->Position.x << "x "
-				<< GamePlayController::Instance().MainCamera->Position.y << "y "
-				<< GamePlayController::Instance().MainCamera->Position.z << "z" << std::endl;
-		}
+	GameInstance = &GamePlayController::Instance();
+
+	if (GameInstance->CurrentScene == IN_GAME)
+	{
+		GameInstance->Character.HandleControls(window, key, scancode, action, mods);
 	}
+	else if (action == GLFW_PRESS)
+	{
+		GameInstance->ButtonPressed = true;
+	}
+
+	// if (action == GLFW_PRESS)
+	// {
+	// 	std::cout << "pressed any key!" << std::endl;
+	// 	GameInstance->ButtonPressed = true;
+	// 	if (GameInstance->CurrentScene == IN_GAME)
+	//  	{
+	// 		// camera placement debug
+	// 		if (key == GLFW_KEY_W)
+	// 		{
+	// 			GameInstance->MainCamera->Position.z += 0.5f;
+	// 		}
+	// 		else if (key == GLFW_KEY_S)
+	// 		{
+	// 			GameInstance->MainCamera->Position.z -= 0.5f;
+	// 		}
+	// 		else if (key == GLFW_KEY_A)
+	// 		{
+	// 			GameInstance->MainCamera->Position.x += 0.5f;
+	// 		}
+	// 		else if (key == GLFW_KEY_D)
+	// 		{
+	// 			GameInstance->MainCamera->Position.x -= 0.5f;
+	// 		}
+	// 		else if (key == GLFW_KEY_SPACE)
+	// 		{
+	// 			GameInstance->MainCamera->Position.y += 0.5f;
+	// 		}
+	// 		else if (key == GLFW_KEY_C)
+	// 		{
+	// 			GameInstance->MainCamera->Position.y -= 0.5f;
+	// 		}
+			
+	// 		std::cout << "Camera: " << GameInstance->MainCamera->Position.x << "x "
+	// 			<< GameInstance->MainCamera->Position.y << "y "
+	// 			<< GameInstance->MainCamera->Position.z << "z" << std::endl;
+	// 	}
+	// }
 }

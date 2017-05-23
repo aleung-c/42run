@@ -83,11 +83,13 @@ typedef enum		e_GameScene
 
 class				Tools;
 class				WorldController;
+class				CharacterController;
 class				GamePlayController;
 class				GlobalGameController;
 
 # include "Tools.hpp"
 # include "WorldController.hpp"
+# include "CharacterController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"
 

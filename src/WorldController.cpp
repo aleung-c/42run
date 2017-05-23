@@ -2,10 +2,12 @@
 
 WorldController::WorldController()
 :
-WorldSpeed(0.01)
+WorldSpeed(0.05)
 {
-	GameSpaceMax_X = 10.0;
-	GameSpaceMin_X = -7.0;
+	GameSpaceMax_X = 11.0;
+	GameSpaceMin_X = -8.0;
+	WorldGenDepth = 6;
+	AppearStrength = 0.1;
 }
 
 WorldController::~WorldController()
@@ -20,40 +22,62 @@ WorldController::~WorldController()
 
 void	WorldController::SpawnInitialWorld()
 {
-	GameObject	*Ground = new GameObject("GroundBlock", "./ressources/models/ground_block_1.obj");
-	Ground->Position.z = 0.0;
-	Ground->Position.x += 0.0;
+	float z_pos = 0;
 
-	GameObject	*Ceiling = new GameObject("GroundBlock", "./ressources/models/ceiling_1.obj");
+	// walls generation. one wall has a depth of 16.0
+	for (int i = 0; i != WorldGenDepth; i++)
+	{
+		WorldObjects.push_back(new GameObject("WallRight", "./ressources/models/basic_wall_1.obj"));
+		WorldObjects.back()->Rotation.y += 90;
+		WorldObjects.back()->Position.x = GameSpaceMin_X;
+		WorldObjects.back()->Position.z = z_pos;
+		WorldObjects.push_back(new GameObject("WallLeft", "./ressources/models/basic_wall_1.obj"));
+		WorldObjects.back()->Rotation.y += 90;
+		WorldObjects.back()->Position.x = GameSpaceMax_X;
+		WorldObjects.back()->Position.z = z_pos;
+		z_pos += 16.0;
+	}
 
-	GameObject	*WallRight = new GameObject("GroundBlock", "./ressources/models/basic_wall_1.obj");
-	WallRight->Rotation.y += 90;
-	WallRight->Position.x = GameSpaceMin_X;
+	z_pos = 0;
+	for (int i = 0; i != WorldGenDepth / 2; i++)
+	{
+		WorldObjects.push_back(new GameObject("GroundBlock", "./ressources/models/ground_block_1.obj"));
+		WorldObjects.back()->Rotation.y += 90;
+		WorldObjects.back()->Position.x = GameSpaceMin_X;
+		WorldObjects.back()->Position.z = z_pos;
+		WorldObjects.push_back(new GameObject("CeilingBlock", "./ressources/models/ceiling_1.obj"));
+		WorldObjects.back()->Rotation.y += 90;
+		WorldObjects.back()->Position.x = GameSpaceMax_X;
+		WorldObjects.back()->Position.z = z_pos;
+		z_pos += 100.0;
+	}
 
-	GameObject	*WallRight2 = new GameObject("GroundBlock", "./ressources/models/basic_wall_1.obj");
-	WallRight2->Rotation.y += 90;
-	WallRight2->Position.x = GameSpaceMin_X;
-	WallRight2->Position.z += 18.0;
-
-	GameObject	*WallLeft = new GameObject("GroundBlock", "./ressources/models/basic_wall_1.obj");
-	WallLeft->Rotation.y += 90;
-	WallLeft->Position.x = GameSpaceMax_X;
-
-	GameObject	*Desk = new GameObject("Desk", "./ressources/models/table_desk_1.obj");
-	Desk->Rotation.y += 90;
-
-	GameObject	*Chair = new GameObject("Chair", "./ressources/models/chair_1.obj");
-
-	WorldObjects.push_back(Ground);
-	WorldObjects.push_back(Ceiling);
-	WorldObjects.push_back(Desk);
-	WorldObjects.push_back(WallRight);
-	WorldObjects.push_back(WallRight2);
-	WorldObjects.push_back(WallLeft);
-	WorldObjects.push_back(Chair);
+	new_wall_text = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(new_wall_text, "./ressources/BasicWall.bmp");
 }
 
 void	WorldController::UpdateWorld()
 {
-	WorldObjects[2]->Rotation.y += 0.8; // desk.
+	// WorldObjects[2]->Rotation.y += 0.8; // desk.
+	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
+	{
+		(*it)->Position.z -= WorldSpeed;
+		if ((*it)->Scale.x < 1.0)
+		{
+			(*it)->Scale.x += AppearStrength;
+			(*it)->Scale.y += AppearStrength;
+			(*it)->Scale.z += AppearStrength;
+		}
+
+		// check wall going out of screen.
+		if ((*it)->Name == "WallRight" || (*it)->Name == "WallLeft")
+		{
+			if ((*it)->Position.z < -10.0)
+			{
+				(*it)->SwapTexture(new_wall_text);
+				(*it)->Position.z += 16.0 * WorldGenDepth;
+				(*it)->Scale = glm::vec3(0.0, 0.0, 0.0);
+			}
+		}
+	}
 }

@@ -21,9 +21,9 @@ class GamePlayController
 
 		GameObject					*MainCamera;
 		glm::vec3					*CameraLookAtPos;
-		WorldController				World;
 
-		GameObject					*Character;
+		WorldController				World;
+		CharacterController			Character;
 
 		GameUIObject				*MainMenuBackground;
 		bool						ButtonPressed;

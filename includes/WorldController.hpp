@@ -17,6 +17,11 @@ class WorldController
 		float				GameSpaceMax_X;
 		float				GameSpaceMin_X;
 
+		int					WorldGenDepth; // number of world steps to be generated ahead.
+		float				AppearStrength;
+
+		t_bmp_texture		*new_wall_text;
+
 
 		std::vector<GameObject *>	WorldObjects;
 
