@@ -38,6 +38,7 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 
 void	CharacterController::Update()
 {
+	Character->Rotation.y += 2;
 	if (MovingLeft == true)
 	{
 		Character->Position.x += MoveSpeed;

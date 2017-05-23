@@ -37,7 +37,7 @@ void	WorldController::SpawnInitialWorld()
 		WorldObjects.back()->Position.z = z_pos;
 		z_pos += 16.0;
 	}
-
+	// ceiling and ground generation.
 	z_pos = 0;
 	for (int i = 0; i != WorldGenDepth / 2; i++)
 	{
@@ -51,16 +51,15 @@ void	WorldController::SpawnInitialWorld()
 		WorldObjects.back()->Position.z = z_pos;
 		z_pos += 100.0;
 	}
-
 	new_wall_text = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
 	GameEngineController::LoadTextureFile(new_wall_text, "./ressources/BasicWall.bmp");
 }
 
 void	WorldController::UpdateWorld()
 {
-	// WorldObjects[2]->Rotation.y += 0.8; // desk.
 	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
 	{
+		// soft scale transition for respawned elements.
 		(*it)->Position.z -= WorldSpeed;
 		if ((*it)->Scale.x < 1.0)
 		{
@@ -68,7 +67,6 @@ void	WorldController::UpdateWorld()
 			(*it)->Scale.y += AppearStrength;
 			(*it)->Scale.z += AppearStrength;
 		}
-
 		// check wall going out of screen.
 		if ((*it)->Name == "WallRight" || (*it)->Name == "WallLeft")
 		{

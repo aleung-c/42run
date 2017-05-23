@@ -135,6 +135,13 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 		GameInstance->ButtonPressed = true;
 	}
 
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		std::cout << "Exiting 42run ..." << std::endl;
+		exit(0);
+	}
+
+	// // Camera displacing tests
 	// if (action == GLFW_PRESS)
 	// {
 	// 	std::cout << "pressed any key!" << std::endl;
