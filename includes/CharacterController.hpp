@@ -8,6 +8,7 @@ class CharacterController
 		~CharacterController();
 
 		GameObject	*Character;
+		GameObject	*CharacterCollider;
 
 		float		CharacterGroundHeight;
 

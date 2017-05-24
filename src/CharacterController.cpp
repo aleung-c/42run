@@ -34,11 +34,17 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 	Character->Position.y = CharacterGroundHeight;
 	Character->Position.z = Position.z;
 
+	CharacterCollider = new GameObject("CharacterCollider", "./ressources/models/character_collision_box.obj");
+	CharacterCollider->Position = Character->Position;
+
+	GameUIObject *UItest = new GameUIObject("UI test", "./ressources/UI_Elem_1.bmp");
+	if (UItest)
+	{
+	}
 }
 
 void	CharacterController::Update()
 {
-	Character->Rotation.y += 2;
 	if (MovingLeft == true)
 	{
 		Character->Position.x += MoveSpeed;
@@ -49,6 +55,7 @@ void	CharacterController::Update()
 	}
 	// jump is special, as releasing in mid air makes the player fall down.
 	HandleJump();
+	CharacterCollider->Position = Character->Position;
 }
 
 /*
@@ -106,9 +113,7 @@ void	CharacterController::HandleJump()
 			Character->Position.y = CharacterGroundHeight;
 		else
 			Character->Position.y -= GravityForce;
-	}
-
-	
+	}	
 }
 
 void	CharacterController::HandleControls(GLFWwindow* window, int key, int scancode, int action, int mods)
