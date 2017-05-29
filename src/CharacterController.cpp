@@ -30,12 +30,20 @@ CharacterController::~CharacterController()
 void	CharacterController::InitCharacter(glm::vec3 Position)
 {
 	Character = new GameObject("Character", "./ressources/models/character_idle.obj");
-	Character->Position.x = Position.x;
-	Character->Position.y = CharacterGroundHeight;
-	Character->Position.z = Position.z;
+	Character->Transform.Position.x = Position.x;
+	Character->Transform.Position.y = CharacterGroundHeight;
+	Character->Transform.Position.z = Position.z;
+
+	CharacterFrame2 = new GameObject("Character", "./ressources/models/character_running_1.obj");
+
+	Character->MorphAnimation.AddKeyFrame(CharacterFrame2);
+	Character->MorphAnimation.AddKeyFrame(Character);
+	Character->MorphAnimation.SetSpeed(0.008);
+	Character->MorphAnimation.SetRepeat(true);
+	Character->MorphAnimation.Start();
 
 	CharacterCollider = new GameObject("CharacterCollider", "./ressources/models/character_collision_box.obj");
-	CharacterCollider->Position = Character->Position;
+	CharacterCollider->Transform.Position = Character->Transform.Position;
 
 	GameUIObject *UItest = new GameUIObject("UI test", "./ressources/UI_Elem_1.bmp");
 	if (UItest)
@@ -47,15 +55,15 @@ void	CharacterController::Update()
 {
 	if (MovingLeft == true)
 	{
-		Character->Position.x += MoveSpeed;
+		Character->Transform.Position.x += MoveSpeed;
 	}
 	else if (MovingRight == true)
 	{
-		Character->Position.x -= MoveSpeed;
+		Character->Transform.Position.x -= MoveSpeed;
 	}
 	// jump is special, as releasing in mid air makes the player fall down.
 	HandleJump();
-	CharacterCollider->Position = Character->Position;
+	CharacterCollider->Transform.Position = Character->Transform.Position;
 }
 
 /*
@@ -68,7 +76,7 @@ void	CharacterController::Update()
 void	CharacterController::HandleJump()
 {
 	// on ground touched.
-	if (Character->Position.y <= CharacterGroundHeight)
+	if (Character->Transform.Position.y <= CharacterGroundHeight)
 	{
 		IsOnGround = true;
 		MaxHeightReached = false;
@@ -85,10 +93,10 @@ void	CharacterController::HandleJump()
 		if (MaxHeightReached == false && JumpUsed == false)
 		{
 			lerpMu += 0.05;
-			//Character->Position.y += JumpForce;
-			Character->Position.y = Tools::LinearInterpolation(Character->Position.y, JumpMaxHeight, lerpMu);
+			//Character->Transform.Position.y += JumpForce;
+			Character->Transform.Position.y = Tools::LinearInterpolation(Character->Transform.Position.y, JumpMaxHeight, lerpMu);
 			
-			if (Character->Position.y >= JumpMaxHeight - 0.02)
+			if (Character->Transform.Position.y >= JumpMaxHeight - 0.02)
 			{
 				MaxHeightReached = true;
 				JumpUsed = true;
@@ -99,20 +107,20 @@ void	CharacterController::HandleJump()
 			if (IsOnGround == false)
 			{
 				// gravity pulling down.
-				if (Character->Position.y - GravityForce < CharacterGroundHeight)
-					Character->Position.y = CharacterGroundHeight;
+				if (Character->Transform.Position.y - GravityForce < CharacterGroundHeight)
+					Character->Transform.Position.y = CharacterGroundHeight;
 				else
-					Character->Position.y -= GravityForce;
+					Character->Transform.Position.y -= GravityForce;
 			}
 		}
 	}
 	else
 	{
 		// gravity pulling down.
-		if (Character->Position.y - GravityForce < CharacterGroundHeight)
-			Character->Position.y = CharacterGroundHeight;
+		if (Character->Transform.Position.y - GravityForce < CharacterGroundHeight)
+			Character->Transform.Position.y = CharacterGroundHeight;
 		else
-			Character->Position.y -= GravityForce;
+			Character->Transform.Position.y -= GravityForce;
 	}	
 }
 

@@ -27,27 +27,27 @@ void	GamePlayController::InitGame()
 
 	// ----- DEBUG and showcase engine.
 	// Character = new GameObject("Character", "./ressources/BasicCriypticman.obj");
-	// Character->Position = glm::vec3(3.0, 0.0, 0.0);
+	// Character->Transform.Position = glm::vec3(3.0, 0.0, 0.0);
 
 	// BasicWall = new GameObject("BasicWall", "./ressources/BasicWall.obj");
-	// BasicWall->Position = glm::vec3(1.0, 0.0, 0.0);
+	// BasicWall->Transform.Position = glm::vec3(1.0, 0.0, 0.0);
 
 	// HelloText = new GameTextObject("HelloText1", "Hello 42 run");
-	// HelloText->Position = glm::vec3(0.0, 0.0, 0.0);
+	// HelloText->Transform.Position = glm::vec3(0.0, 0.0, 0.0);
 	// HelloText->Color = glm::vec3(1.0, 1.0, 1.0);
 
 	// HelloText2 = new GameTextObject("HelloText1", "Hello2pgbcvl");
-	// HelloText2->Position = glm::vec3(100.0, 70.0, 0.0);
+	// HelloText2->Transform.Position = glm::vec3(100.0, 70.0, 0.0);
 	// HelloText2->Color = glm::vec3(1.0, 1.0, 1.0);
 
 	// UIElem = new GameUIObject("UIELEM1", "./ressources/UI_Elem_1.bmp");
-	// UIElem->Position = glm::vec3(200.0, 120.0, 0.0);
+	// UIElem->Transform.Position = glm::vec3(200.0, 120.0, 0.0);
 	// UIElem2 = new GameUIObject("UIELEM2", "./ressources/UI_Elem_1.bmp");
-	// UIElem2->Position = glm::vec3(600.0, 120.0, 0.0);
+	// UIElem2->Transform.Position = glm::vec3(600.0, 120.0, 0.0);
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
 
-	MainCamera->Position = glm::vec3(0.0, 4.5, -10.5);
+	MainCamera->Transform.Position = glm::vec3(0.0, 4.5, -10.5);
 	CameraLookAtPos->x = 0.0;
 	CameraLookAtPos->y = 1.0;
 	CameraLookAtPos->z = 8.0;
@@ -72,18 +72,18 @@ void	GamePlayController::InitGame()
 void	GamePlayController::Update()
 {
 	// ----- DEBUG and showcase engine.
-	// Character->Rotation.y += 0.001;
-	// Character->Position.z += 0.001;
-	// BasicWall->Rotation.y += 0.003;
+	// Character->Transform.Rotation.y += 0.001;
+	// Character->Transform.Position.z += 0.001;
+	// BasicWall->Transform.Rotation.y += 0.003;
 
 	if (CurrentScene == MAIN_MENU)
 	{
 		if (ButtonPressed == true)
 		{
 			// transitionning to ingame;
-			if (MainMenuBackground->Position.x < 1280.0)
+			if (MainMenuBackground->Transform.Position.x < 1280.0)
 			{
-				MainMenuBackground->Position.x = Tools::LinearInterpolation(MainMenuBackground->Position.x, 1280.0, lerpmu);
+				MainMenuBackground->Transform.Position.x = Tools::LinearInterpolation(MainMenuBackground->Transform.Position.x, 1280.0, lerpmu);
 				lerpmu += 0.005;
 			}
 			else
@@ -151,32 +151,32 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 	// 		// camera placement debug
 	// 		if (key == GLFW_KEY_W)
 	// 		{
-	// 			GameInstance->MainCamera->Position.z += 0.5f;
+	// 			GameInstance->MainCamera->Transform.Position.z += 0.5f;
 	// 		}
 	// 		else if (key == GLFW_KEY_S)
 	// 		{
-	// 			GameInstance->MainCamera->Position.z -= 0.5f;
+	// 			GameInstance->MainCamera->Transform.Position.z -= 0.5f;
 	// 		}
 	// 		else if (key == GLFW_KEY_A)
 	// 		{
-	// 			GameInstance->MainCamera->Position.x += 0.5f;
+	// 			GameInstance->MainCamera->Transform.Position.x += 0.5f;
 	// 		}
 	// 		else if (key == GLFW_KEY_D)
 	// 		{
-	// 			GameInstance->MainCamera->Position.x -= 0.5f;
+	// 			GameInstance->MainCamera->Transform.Position.x -= 0.5f;
 	// 		}
 	// 		else if (key == GLFW_KEY_SPACE)
 	// 		{
-	// 			GameInstance->MainCamera->Position.y += 0.5f;
+	// 			GameInstance->MainCamera->Transform.Position.y += 0.5f;
 	// 		}
 	// 		else if (key == GLFW_KEY_C)
 	// 		{
-	// 			GameInstance->MainCamera->Position.y -= 0.5f;
+	// 			GameInstance->MainCamera->Transform.Position.y -= 0.5f;
 	// 		}
 			
-	// 		std::cout << "Camera: " << GameInstance->MainCamera->Position.x << "x "
-	// 			<< GameInstance->MainCamera->Position.y << "y "
-	// 			<< GameInstance->MainCamera->Position.z << "z" << std::endl;
+	// 		std::cout << "Camera: " << GameInstance->MainCamera->Transform.Position.x << "x "
+	// 			<< GameInstance->MainCamera->Transform.Position.y << "y "
+	// 			<< GameInstance->MainCamera->Transform.Position.z << "z" << std::endl;
 	// 	}
 	// }
 }

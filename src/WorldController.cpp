@@ -28,13 +28,13 @@ void	WorldController::SpawnInitialWorld()
 	for (int i = 0; i != WorldGenDepth; i++)
 	{
 		WorldObjects.push_back(new GameObject("WallRight", "./ressources/models/basic_wall_1.obj"));
-		WorldObjects.back()->Rotation.y += 90;
-		WorldObjects.back()->Position.x = GameSpaceMin_X;
-		WorldObjects.back()->Position.z = z_pos;
+		WorldObjects.back()->Transform.Rotation.y += 90;
+		WorldObjects.back()->Transform.Position.x = GameSpaceMin_X;
+		WorldObjects.back()->Transform.Position.z = z_pos;
 		WorldObjects.push_back(new GameObject("WallLeft", "./ressources/models/basic_wall_1.obj"));
-		WorldObjects.back()->Rotation.y += 90;
-		WorldObjects.back()->Position.x = GameSpaceMax_X;
-		WorldObjects.back()->Position.z = z_pos;
+		WorldObjects.back()->Transform.Rotation.y += 90;
+		WorldObjects.back()->Transform.Position.x = GameSpaceMax_X;
+		WorldObjects.back()->Transform.Position.z = z_pos;
 		z_pos += 16.0;
 	}
 	// ceiling and ground generation.
@@ -42,13 +42,13 @@ void	WorldController::SpawnInitialWorld()
 	for (int i = 0; i != WorldGenDepth / 2; i++)
 	{
 		WorldObjects.push_back(new GameObject("GroundBlock", "./ressources/models/ground_block_1.obj"));
-		WorldObjects.back()->Rotation.y += 90;
-		WorldObjects.back()->Position.x = GameSpaceMin_X;
-		WorldObjects.back()->Position.z = z_pos;
+		WorldObjects.back()->Transform.Rotation.y += 90;
+		WorldObjects.back()->Transform.Position.x = GameSpaceMin_X;
+		WorldObjects.back()->Transform.Position.z = z_pos;
 		WorldObjects.push_back(new GameObject("CeilingBlock", "./ressources/models/ceiling_1.obj"));
-		WorldObjects.back()->Rotation.y += 90;
-		WorldObjects.back()->Position.x = GameSpaceMax_X;
-		WorldObjects.back()->Position.z = z_pos;
+		WorldObjects.back()->Transform.Rotation.y += 90;
+		WorldObjects.back()->Transform.Position.x = GameSpaceMax_X;
+		WorldObjects.back()->Transform.Position.z = z_pos;
 		z_pos += 100.0;
 	}
 	new_wall_text = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
@@ -60,21 +60,21 @@ void	WorldController::UpdateWorld()
 	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
 	{
 		// soft scale transition for respawned elements.
-		(*it)->Position.z -= WorldSpeed;
-		if ((*it)->Scale.x < 1.0)
+		(*it)->Transform.Position.z -= WorldSpeed;
+		if ((*it)->Transform.Scale.x < 1.0)
 		{
-			(*it)->Scale.x += AppearStrength;
-			(*it)->Scale.y += AppearStrength;
-			(*it)->Scale.z += AppearStrength;
+			(*it)->Transform.Scale.x += AppearStrength;
+			(*it)->Transform.Scale.y += AppearStrength;
+			(*it)->Transform.Scale.z += AppearStrength;
 		}
 		// check wall going out of screen.
 		if ((*it)->Name == "WallRight" || (*it)->Name == "WallLeft")
 		{
-			if ((*it)->Position.z < -10.0)
+			if ((*it)->Transform.Position.z < -10.0)
 			{
-				(*it)->SwapTexture(new_wall_text);
-				(*it)->Position.z += 16.0 * WorldGenDepth;
-				(*it)->Scale = glm::vec3(0.0, 0.0, 0.0);
+				(*it)->Texture.Swap(new_wall_text);
+				(*it)->Transform.Position.z += 16.0 * WorldGenDepth;
+				(*it)->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
 			}
 		}
 	}
