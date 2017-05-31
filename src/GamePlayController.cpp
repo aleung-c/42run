@@ -44,6 +44,7 @@ void	GamePlayController::InitGame()
 	// UIElem->Transform.Position = glm::vec3(200.0, 120.0, 0.0);
 	// UIElem2 = new GameUIObject("UIELEM2", "./ressources/UI_Elem_1.bmp");
 	// UIElem2->Transform.Position = glm::vec3(600.0, 120.0, 0.0);
+	GameEngineController::Instance().DebugMode = true;
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
 
@@ -54,8 +55,7 @@ void	GamePlayController::InitGame()
 
 	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
 	World.SpawnInitialWorld();
-	
-	Character.InitCharacter(glm::vec3(3.0, 0.0, 0.0));
+	Character.InitCharacter(glm::vec3(0.0, 0.0, -2.0));
 	lerpmu = 0.0;
 }
 

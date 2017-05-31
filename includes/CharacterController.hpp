@@ -7,6 +7,9 @@ class CharacterController
 		CharacterController();
 		~CharacterController();
 
+		// Other controller access attachment
+		WorldController	*WorldController;
+
 		// Character
 		GameObject	*Character;
 
@@ -31,6 +34,8 @@ class CharacterController
 		bool		IsOnGround;
 		bool		MaxHeightReached;
 
+		float		PlayerWallsOffset;
+
 		// key flags
 		bool		MovingLeft;
 		bool		MovingRight;
@@ -46,6 +51,7 @@ class CharacterController
 		void		SetRunAnimation();
 		void		SetJumpAnimation();
 
+		void		HandleMoving();
 		void		HandleJump();
 		void		HandleControls(GLFWwindow* window, int key, int scancode, int action, int mods);
 		void		Update();

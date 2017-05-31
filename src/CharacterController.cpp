@@ -12,14 +12,21 @@
 */
 
 CharacterController::CharacterController()
+:
+	GravityForce(DEFAULT_GRAVITY_FORCE),
+	JumpForce(DEFAULT_JUMP_FORCE),
+	MoveSpeed(DEFAULT_MOVE_SPEED),
+	JumpMaxHeight(DEFAULT_JUMP_MAX_HEIGHT),
+	PlayerWallsOffset(DEFAULT_PLAYER_WALLS_OFFSET)
 {
-	MoveSpeed = 0.2;
-	GravityForce = 0.35;
-	JumpForce = 0.4;
-	JumpMaxHeight = 4.0;
+	// GravityForce = 0.35;
+	// JumpForce = 0.4;
+	// MoveSpeed = 0.2;
+	// JumpMaxHeight = 4.0;
+
 	IsOnGround = true;
 	lerpMu = 0.0;
-	CharacterGroundHeight = 0.4;
+	CharacterGroundHeight = 0.8;
 }
 
 CharacterController::~CharacterController()
@@ -29,6 +36,8 @@ CharacterController::~CharacterController()
 
 void	CharacterController::InitCharacter(glm::vec3 Position)
 {
+	WorldController = &(GamePlayController::Instance().World);
+
 	Character = new GameObject("Character", "./ressources/models/character_idle.obj");
 	Character->Transform.Position.x = Position.x;
 	Character->Transform.Position.y = CharacterGroundHeight;
@@ -36,15 +45,13 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 
 	LoadCharacterAnimationsKeys();
 
-
-
 	CharacterCollider = new GameObject("CharacterCollider", "./ressources/models/character_collision_box.obj");
 	CharacterCollider->Transform.Position = Character->Transform.Position;
 
-	GameUIObject *UItest = new GameUIObject("UI test", "./ressources/UI_Elem_1.bmp");
-	if (UItest)
-	{
-	}
+	// GameUIObject *UItest = new GameUIObject("UI test", "./ressources/UI_Elem_1.bmp");
+	// if (UItest)
+	// {
+	// }
 }
 
 /*
@@ -95,19 +102,35 @@ void	CharacterController::SetJumpAnimation()
 	Character->MorphAnimation.Start();
 }
 
+/*
+**	Called at each frame.
+*/
+
 void	CharacterController::Update()
+{
+	HandleMoving();
+	HandleJump();
+	CharacterCollider->Transform.Position = Character->Transform.Position;
+}
+
+void	CharacterController::HandleMoving()
 {
 	if (MovingLeft == true)
 	{
-		Character->Transform.Position.x += MoveSpeed;
+		if (Character->Transform.Position.x
+			< (WorldController->GameSpaceMax_X - PlayerWallsOffset))
+		{
+			Character->Transform.Position.x += MoveSpeed;
+		}
 	}
 	else if (MovingRight == true)
 	{
+		if (Character->Transform.Position.x
+			> (WorldController->GameSpaceMin_X + PlayerWallsOffset))
+		{
 		Character->Transform.Position.x -= MoveSpeed;
+		}
 	}
-	// jump is special, as releasing in mid air makes the player fall down.
-	HandleJump();
-	CharacterCollider->Transform.Position = Character->Transform.Position;
 }
 
 /*
@@ -125,6 +148,7 @@ void	CharacterController::HandleJump()
 		IsOnGround = true;
 		MaxHeightReached = false;
 		lerpMu = 0.0;
+		// change animation state.
 		if (!IsRunning)
 		{
 			IsJumping = false;
@@ -138,21 +162,24 @@ void	CharacterController::HandleJump()
 	}
 
 	// when space pressed
-	if (JumpPressed)
+	if (JumpPressed && JumpUsed == false)
 	{
-		IsRunning = false;
+		// change animation state.
 		if (!IsJumping)
 		{
+			IsRunning = false;
 			IsJumping = true;
 			SetJumpAnimation();
 		}
-		Character->MorphAnimation.NextFrame = Character_Jumping;
+
 		if (MaxHeightReached == false && JumpUsed == false)
 		{
+			// JUMP FORCE UP
 			lerpMu += 0.05;
-			//Character->Transform.Position.y += JumpForce;
-			Character->Transform.Position.y = Tools::LinearInterpolation(Character->Transform.Position.y, JumpMaxHeight, lerpMu);
-			
+			Character->Transform.Position.y
+				= Tools::LinearInterpolation(Character->Transform.Position.y, JumpMaxHeight, lerpMu);
+
+			// check if max height reached. (-0.02 to avoid last lerp slowing down)
 			if (Character->Transform.Position.y >= JumpMaxHeight - 0.02)
 			{
 				MaxHeightReached = true;
@@ -173,12 +200,12 @@ void	CharacterController::HandleJump()
 	}
 	else
 	{
-		// gravity pulling down.
+		// by default, gravity pulling down.
 		if (Character->Transform.Position.y - GravityForce < CharacterGroundHeight)
 			Character->Transform.Position.y = CharacterGroundHeight;
 		else
 			Character->Transform.Position.y -= GravityForce;
-	}	
+	}
 }
 
 void	CharacterController::HandleControls(GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -25,11 +25,14 @@ class WorldController
 
 		std::vector<GameObject *>	WorldObjects;
 
+		GameObject			*BackgroundPlane;
+
 		WorldController();
 		~WorldController();
 
 		void	SpawnInitialWorld();
 		void	UpdateWorld();
+		void	RepushObjectsAtFront(GameObject *obj);
 	
 };
 
