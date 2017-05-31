@@ -24,13 +24,18 @@ class WorldController
 
 
 		std::vector<GameObject *>	WorldObjects;
+		std::vector<GameObject *>	ObstaclesList;
 
 		GameObject			*BackgroundPlane;
 
 		WorldController();
 		~WorldController();
 
+		void	InitObstacles();
 		void	SpawnInitialWorld();
+
+		void	ObstacleSpawn();
+
 		void	UpdateWorld();
 		void	RepushObjectsAtFront(GameObject *obj);
 	

@@ -19,6 +19,21 @@ WorldController::~WorldController()
 }
 
 /*
+**	Before using them, we will load the obstacles in memory.
+*/
+
+void	WorldController::InitObstacles()
+{
+	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/chair_1.obj"));
+	ObstaclesList.back()->Transform.Rotation.y = 90.0;
+	ObstaclesList.push_back(new GameObject("Obstacle_wall_1", "./ressources/models/obstacle_wall_1.obj"));
+	ObstaclesList.back()->Transform.Position.z = 1.0;
+	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
+	ObstaclesList.back()->Transform.Position.z = 1.0;
+	ObstaclesList.back()->Transform.Rotation.y = 90.0;
+}
+
+/*
 **	At first, we want to spawn a base of world before making a continuous
 **	world generation.
 */
@@ -38,12 +53,12 @@ void	WorldController::SpawnInitialWorld()
 		WorldObjects.push_back(new GameObject("WallRight", "./ressources/models/basic_wall_1.obj"));
 		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMin_X;
-		WorldObjects.back()->Transform.Position.y = 4.5;
+		WorldObjects.back()->Transform.Position.y = 5;
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		WorldObjects.push_back(new GameObject("WallLeft", "./ressources/models/basic_wall_1.obj"));
 		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMax_X;
-		WorldObjects.back()->Transform.Position.y = 4.5;
+		WorldObjects.back()->Transform.Position.y = 5;
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		z_pos += 16.0;
 	}
@@ -54,12 +69,12 @@ void	WorldController::SpawnInitialWorld()
 		WorldObjects.push_back(new GameObject("GroundBlock", "./ressources/models/ground_block_1.obj"));
 		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMin_X;
-		WorldObjects.back()->Transform.Position.y = -2.0;
+		WorldObjects.back()->Transform.Position.y = -0.25;
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		WorldObjects.push_back(new GameObject("CeilingBlock", "./ressources/models/ceiling_1.obj"));
 		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMax_X;
-		WorldObjects.back()->Transform.Position.y = 12;
+		WorldObjects.back()->Transform.Position.y = 14;
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		z_pos += 50.0;
 	}
@@ -67,8 +82,24 @@ void	WorldController::SpawnInitialWorld()
 	GameEngineController::LoadTextureFile(new_wall_text, "./ressources/BasicWall.bmp");
 }
 
+/*
+**	For this method, ill make a randomized timer that will spawn obstacles at interval.
+*/
+
+void	WorldController::ObstacleSpawn()
+{
+	// TODO:
+	// set random timer start
+	// look for timer time's up.
+	// spawn obstacle from pool.
+}
+
 void	WorldController::UpdateWorld()
 {
+	// spawn obstacles on the field
+	ObstacleSpawn();
+
+	// Operations on every spawned objects.
 	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
 	{
 		// every world object in the list moves toward the player.

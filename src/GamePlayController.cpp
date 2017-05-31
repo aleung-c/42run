@@ -48,14 +48,15 @@ void	GamePlayController::InitGame()
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
 
-	MainCamera->Transform.Position = glm::vec3(0.0, 4.5, -10.5);
+	MainCamera->Transform.Position = glm::vec3(0.0, 6, -10.5);
 	CameraLookAtPos->x = 0.0;
 	CameraLookAtPos->y = 1.0;
 	CameraLookAtPos->z = 8.0;
 
 	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
+	World.InitObstacles();
 	World.SpawnInitialWorld();
-	Character.InitCharacter(glm::vec3(0.0, 0.0, -2.0));
+	Character.InitCharacter(glm::vec3(0.0, 0.0, -3.0));
 	lerpmu = 0.0;
 }
 

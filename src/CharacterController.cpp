@@ -23,10 +23,9 @@ CharacterController::CharacterController()
 	// JumpForce = 0.4;
 	// MoveSpeed = 0.2;
 	// JumpMaxHeight = 4.0;
-
 	IsOnGround = true;
 	lerpMu = 0.0;
-	CharacterGroundHeight = 0.8;
+	CharacterGroundHeight = 2.5;
 }
 
 CharacterController::~CharacterController()
@@ -42,6 +41,9 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 	Character->Transform.Position.x = Position.x;
 	Character->Transform.Position.y = CharacterGroundHeight;
 	Character->Transform.Position.z = Position.z;
+
+	// reajust max jump height from char vertical position.
+	JumpMaxHeight += Character->Transform.Position.y;
 
 	LoadCharacterAnimationsKeys();
 
