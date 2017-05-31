@@ -2,7 +2,10 @@
 
 WorldController::WorldController()
 :
-WorldSpeed(0.05)
+WorldSpeed(DEFAULT_WORLD_SPEED),
+GameSpaceMax_X(DEFAULT_GAMESPACE_MAX_X),
+GameSpaceMin_X(DEFAULT_GAMESPACE_MIN_X),
+WorldGenDepth(DEFAULT_WORLD_GEN_DEPTH)
 {
 	GameSpaceMax_X = 11.0;
 	GameSpaceMin_X = -8.0;
@@ -59,7 +62,7 @@ void	WorldController::UpdateWorld()
 {
 	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
 	{
-		// soft scale transition for respawned elements.
+		// soft scale transition for respawned elements clipping.
 		(*it)->Transform.Position.z -= WorldSpeed;
 		if ((*it)->Transform.Scale.x < 1.0)
 		{

@@ -34,13 +34,9 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 	Character->Transform.Position.y = CharacterGroundHeight;
 	Character->Transform.Position.z = Position.z;
 
-	CharacterFrame2 = new GameObject("Character", "./ressources/models/character_running_1.obj");
+	LoadCharacterAnimationsKeys();
 
-	Character->MorphAnimation.AddKeyFrame(CharacterFrame2);
-	Character->MorphAnimation.AddKeyFrame(Character);
-	Character->MorphAnimation.SetSpeed(0.008);
-	Character->MorphAnimation.SetRepeat(true);
-	Character->MorphAnimation.Start();
+
 
 	CharacterCollider = new GameObject("CharacterCollider", "./ressources/models/character_collision_box.obj");
 	CharacterCollider->Transform.Position = Character->Transform.Position;
@@ -49,6 +45,54 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 	if (UItest)
 	{
 	}
+}
+
+/*
+**	Here, we will load each 3d model and texture for the character's different
+**	Key animations frames, to make the morph targets.
+*/
+
+void	CharacterController::LoadCharacterAnimationsKeys()
+{
+	Character_Idle = new GameObject("Character", "./ressources/models/character_idle.obj");
+	Character_Running1 = new GameObject("Character_key", "./ressources/models/character_running_1.obj");
+	Character_Running2 = new GameObject("Character_key", "./ressources/models/character_running_2.obj");
+	Character_Jumping = new GameObject("Character_key", "./ressources/models/character_jumping.obj");
+	Character_Idle->Visible = false;
+	Character_Running1->Visible = false;
+	Character_Running2->Visible = false;
+	Character_Jumping->Visible = false;
+
+	Character->MorphAnimation.SetSpeed(0.2);
+	SetRunAnimation();
+	Character->MorphAnimation.Start();
+}
+
+void	CharacterController::SetRunAnimation()
+{
+	// basic run animation.
+	Character->MorphAnimation.Stop();
+	Character->MorphAnimation.ClearFrames();
+	Character->MorphAnimation.SetRepeat(true);
+	Character->MorphAnimation.SetSpeed(0.2);
+	Character->MorphAnimation.AddKeyFrame(Character_Running1);
+	Character->MorphAnimation.AddKeyFrame(Character);
+	Character->MorphAnimation.AddKeyFrame(Character_Running2);
+	Character->MorphAnimation.AddKeyFrame(Character);
+	Character->MorphAnimation.Start();
+}
+
+void	CharacterController::SetJumpAnimation()
+{
+	// basic run animation.
+	Character->MorphAnimation.Stop();
+	Character->MorphAnimation.ClearFrames();
+	Character->MorphAnimation.SetRepeat(false);
+	Character->MorphAnimation.SetSpeed(0.07);
+	Character->MorphAnimation.SetStayOnEnd(true);
+	Character->MorphAnimation.CurFrame = Character_Idle;
+	Character->MorphAnimation.AddKeyFrame(Character_Jumping);
+	Character->MorphAnimation.Start();
 }
 
 void	CharacterController::Update()
@@ -81,6 +125,12 @@ void	CharacterController::HandleJump()
 		IsOnGround = true;
 		MaxHeightReached = false;
 		lerpMu = 0.0;
+		if (!IsRunning)
+		{
+			IsJumping = false;
+			IsRunning = true;
+			SetRunAnimation();
+		}
 	}
 	else
 	{
@@ -90,6 +140,13 @@ void	CharacterController::HandleJump()
 	// when space pressed
 	if (JumpPressed)
 	{
+		IsRunning = false;
+		if (!IsJumping)
+		{
+			IsJumping = true;
+			SetJumpAnimation();
+		}
+		Character->MorphAnimation.NextFrame = Character_Jumping;
 		if (MaxHeightReached == false && JumpUsed == false)
 		{
 			lerpMu += 0.05;

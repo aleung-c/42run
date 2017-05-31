@@ -75,6 +75,15 @@
 # define WINDOW_HEIGHT 720
 # define WINDOW_NAME "aleung-c's 42run"
 
+// GamePlay variables
+
+# define DEFAULT_WORLD_SPEED 0.2
+# define DEFAULT_CHAR_ANIM_SPEED 0.2
+
+# define DEFAULT_GAMESPACE_MAX_X 11.0
+# define DEFAULT_GAMESPACE_MIN_X -8.0
+# define DEFAULT_WORLD_GEN_DEPTH 6
+
 typedef enum		e_GameScene
 {
 	MAIN_MENU,
