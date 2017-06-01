@@ -2,10 +2,12 @@
 
 WorldController::WorldController()
 :
-WorldSpeed(DEFAULT_WORLD_SPEED),
-GameSpaceMax_X(DEFAULT_GAMESPACE_MAX_X),
-GameSpaceMin_X(DEFAULT_GAMESPACE_MIN_X),
-WorldGenDepth(DEFAULT_WORLD_GEN_DEPTH)
+	WorldSpeed(DEFAULT_WORLD_SPEED),
+	GameSpaceMax_X(DEFAULT_GAMESPACE_MAX_X),
+	GameSpaceMin_X(DEFAULT_GAMESPACE_MIN_X),
+	WorldGenDepth(DEFAULT_WORLD_GEN_DEPTH),
+	SpawnTimerStarted(false),
+	TimeUntilSpawn(DEFAULT_SEC_UNTIL_OBSTACLE)
 {
 	// GameSpaceMax_X = 11.0;
 	// GameSpaceMin_X = -8.0;
@@ -24,13 +26,53 @@ WorldController::~WorldController()
 
 void	WorldController::InitObstacles()
 {
+	// fallen chair
 	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/chair_1.obj"));
 	ObstaclesList.back()->Transform.Rotation.y = 90.0;
+	// grillage obstacle pillar
 	ObstaclesList.push_back(new GameObject("Obstacle_wall_1", "./ressources/models/obstacle_wall_1.obj"));
-	ObstaclesList.back()->Transform.Position.z = 1.0;
+	// WoodPillar obstacle
+	ObstaclesList.push_back(new GameObject("Obstacle_wall_2", "./ressources/models/obstacle_wall_2.obj"));
+	// desk 1
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
-	ObstaclesList.back()->Transform.Position.z = 1.0;
+	ObstaclesList.back()->Transform.Position.y = 2.0;
 	ObstaclesList.back()->Transform.Rotation.y = 90.0;
+	// desk 1 reversed.
+	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1b", "./ressources/models/table_desk_1.obj"));
+	ObstaclesList.back()->Transform.Position.y = 2.0;
+	ObstaclesList.back()->Transform.Rotation.y = -90.0;
+
+	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
+		it != ObstaclesList.end(); it++)
+	{
+		(*it)->Visible = false;
+		(*it)->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
+	}
+}
+
+
+void		WorldController::InitTextureVariations()
+{
+	// init different wall textures
+	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_1.bmp");
+	WallTexturesVariations.push_back(tmp_texture);
+
+	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_2.bmp");
+	WallTexturesVariations.push_back(tmp_texture);
+
+	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_3.bmp");
+	WallTexturesVariations.push_back(tmp_texture);
+
+	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_4.bmp");
+	WallTexturesVariations.push_back(tmp_texture);
+
+	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_5.bmp");
+	WallTexturesVariations.push_back(tmp_texture);
 }
 
 /*
@@ -78,8 +120,6 @@ void	WorldController::SpawnInitialWorld()
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		z_pos += 50.0;
 	}
-	new_wall_text = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
-	GameEngineController::LoadTextureFile(new_wall_text, "./ressources/BasicWall.bmp");
 }
 
 /*
@@ -88,9 +128,38 @@ void	WorldController::SpawnInitialWorld()
 
 void	WorldController::ObstacleSpawn()
 {
-	// TODO:
-	// set random timer start
-	// look for timer time's up.
+	// set random timer start or reset counter;
+	if (SpawnTimerStarted == false)
+	{
+		SpawnTimerStarted = true;
+		Start = std::chrono::system_clock::now();
+	}
+	if (SpawnTimerStarted)
+	{
+		// look for timer time's up.
+		End = std::chrono::system_clock::now();
+
+		ElapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>
+			(End - Start).count();
+
+		if (ElapsedSeconds >= TimeUntilSpawn)
+		{
+			// spawn new obstacle
+			SpawnedObject = ObstaclesList[rand() % (ObstaclesList.size())];
+			if (SpawnedObject->Transform.Position.z < -10.0)
+			{
+				SpawnedObject->Visible = true;
+				SpawnedObject->Transform.Position.z = 50.0;
+				SpawnedObject->Transform.Position.x = Tools::GetRandomDouble(GameSpaceMin_X, GameSpaceMax_X);
+
+				SpawnedObject->Transform.Scale.x = 0.0;
+				SpawnedObject->Transform.Scale.y = 0.0;
+				SpawnedObject->Transform.Scale.z = 0.0;
+			}
+			// reset timer
+			SpawnTimerStarted = false;
+		}
+	}
 	// spawn obstacle from pool.
 }
 
@@ -98,9 +167,23 @@ void	WorldController::UpdateWorld()
 {
 	// spawn obstacles on the field
 	ObstacleSpawn();
+	// obstacle move toward player
+	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
+			it != ObstaclesList.end(); it++)
+	{
+		// soft scale transition for respawned elements clipping.
+		if ((*it)->Transform.Scale.x < 1.0)
+		{
+			(*it)->Transform.Scale.x += AppearStrength;
+			(*it)->Transform.Scale.y += AppearStrength;
+			(*it)->Transform.Scale.z += AppearStrength;
+		}
+		(*it)->Transform.Position.z -= WorldSpeed;
+	}
 
 	// Operations on every spawned objects.
-	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
+	for (std::vector<GameObject *>::iterator it = WorldObjects.begin();
+			it != WorldObjects.end(); it++)
 	{
 		// every world object in the list moves toward the player.
 		(*it)->Transform.Position.z -= WorldSpeed;
@@ -112,7 +195,7 @@ void	WorldController::UpdateWorld()
 			(*it)->Transform.Scale.y += AppearStrength;
 			(*it)->Transform.Scale.z += AppearStrength;
 		}
-		RepushObjectsAtFront((*it));		
+		RepushObjectsAtFront((*it));
 	}
 }
 
@@ -123,7 +206,7 @@ void	WorldController::RepushObjectsAtFront(GameObject *obj)
 	{
 		if (obj->Transform.Position.z < -16.0)
 		{
-			obj->Texture.Swap(new_wall_text);
+			obj->Texture.Swap(WallTexturesVariations[rand() % WallTexturesVariations.size()]);
 			obj->Transform.Position.z += 16.0 * WorldGenDepth;
 			obj->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
 		}

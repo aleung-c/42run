@@ -7,6 +7,7 @@
 	{
 		public:
 			static float	LinearInterpolation(float a, float b, float mu);
+			static double	GetRandomDouble(double min, double max);
 	};
 
 #endif

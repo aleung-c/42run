@@ -25,6 +25,9 @@ class GamePlayController
 		WorldController				World;
 		CharacterController			Character;
 
+		GameCollisionController		CollisionController;
+		GameObject					*CollidingObject;
+
 		GameUIObject				*MainMenuBackground;
 		bool						ButtonPressed;
 		bool						TransitionDone;

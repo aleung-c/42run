@@ -13,31 +13,49 @@
 class WorldController
 {
 	public:
-		float				WorldSpeed;
-		float				GameSpaceMax_X;
-		float				GameSpaceMin_X;
+		// ----- Basic World generation variables
+		float							WorldSpeed;
+		float							GameSpaceMax_X;
+		float							GameSpaceMin_X;
 
-		int					WorldGenDepth; // number of world steps to be generated ahead.
-		float				AppearStrength;
+		int								WorldGenDepth; // number of world steps to be generated ahead.
+		float							AppearStrength;
 
-		t_bmp_texture		*new_wall_text;
+		std::vector<t_bmp_texture *>	WallTexturesVariations;		
+		t_bmp_texture					*new_wall_text;
 
+		GameObject						*BackgroundPlane;
 
-		std::vector<GameObject *>	WorldObjects;
-		std::vector<GameObject *>	ObstaclesList;
+		std::vector<GameObject *>		WorldObjects;
 
-		GameObject			*BackgroundPlane;
+		// ------ Obstacle spawning
+		std::vector<GameObject *>		ObstaclesList;
+		bool							SpawnTimerStarted;
+
+		// time points
+		int								TimeUntilSpawn;
+		int								ElapsedSeconds;
+		std::chrono::time_point<std::chrono::system_clock>	Start;
+		std::chrono::time_point<std::chrono::system_clock>	End;
+
+		GameObject						*SpawnedObject;
+
 
 		WorldController();
 		~WorldController();
 
+		void	InitTextureVariations();
 		void	InitObstacles();
+
 		void	SpawnInitialWorld();
 
 		void	ObstacleSpawn();
 
 		void	UpdateWorld();
 		void	RepushObjectsAtFront(GameObject *obj);
+
+	private:
+		t_bmp_texture					*tmp_texture;
 	
 };
 

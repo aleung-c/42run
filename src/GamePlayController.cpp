@@ -1,7 +1,11 @@
 # include "../includes/QDrun.hpp"
 
-GamePlayController::GamePlayController() : CurrentScene(MAIN_MENU),
-ButtonPressed(false)
+GamePlayController::GamePlayController()
+:	
+	CurrentScene(MAIN_MENU),
+	CollidingObject(NULL),
+	ButtonPressed(false)
+
 {
 
 }
@@ -55,9 +59,12 @@ void	GamePlayController::InitGame()
 
 	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
 	World.InitObstacles();
+	World.InitTextureVariations();
 	World.SpawnInitialWorld();
 	Character.InitCharacter(glm::vec3(0.0, 0.0, -3.0));
 	lerpmu = 0.0;
+
+	CollisionController.InitGameCollisions(&Character, &World);
 }
 
 // --------------------------------------------------------------------	//
@@ -101,6 +108,10 @@ void	GamePlayController::Update()
 	{
 		World.UpdateWorld();
 		Character.Update();
+		if ((CollidingObject = CollisionController.PlayerCollides()))
+		{
+			std::cout << "COLLISION WITH " << CollidingObject->Name << std::endl;
+		}
 	}
 }
 

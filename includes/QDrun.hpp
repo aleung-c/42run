@@ -69,7 +69,7 @@
 // #include <ft2build.h>
 // #include FT_FREETYPE_H
 
-// Defines
+// Default Defines
 
 # define WINDOW_WIDTH 1280
 # define WINDOW_HEIGHT 720
@@ -90,6 +90,10 @@
 # define DEFAULT_JUMP_MAX_HEIGHT 4.0
 # define DEFAULT_PLAYER_WALLS_OFFSET 2.0
 
+// Gameplay difficulty defines
+
+# define DEFAULT_SEC_UNTIL_OBSTACLE 5
+
 typedef enum		e_GameScene
 {
 	MAIN_MENU,
@@ -99,12 +103,14 @@ typedef enum		e_GameScene
 class				Tools;
 class				WorldController;
 class				CharacterController;
+class				GameCollisionController;
 class				GamePlayController;
 class				GlobalGameController;
 
 # include "Tools.hpp"
 # include "WorldController.hpp"
 # include "CharacterController.hpp"
+# include "GameCollisionController.hpp"
 # include "GamePlayController.hpp"
 # include "GlobalGameController.hpp"
 
