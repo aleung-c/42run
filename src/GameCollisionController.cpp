@@ -50,6 +50,7 @@ bool			GameCollisionController::BoxCollisionIntersects(GameObject *obj1, GameObj
 			// Z axis
 		&& (obj1->Transform.Position.z + obj1->BoundingBox.Min.z <= obj2->Transform.Position.z + obj2->BoundingBox.Max.z
 		&& obj1->Transform.Position.z + obj1->BoundingBox.Max.z >= obj2->Transform.Position.z + obj2->BoundingBox.Min.z)
+		// X axis AABB
 		// (obj1->BoundingBox.Min.x <= obj2->BoundingBox.Max.x
 		// && obj1->BoundingBox.Max.x >= obj2->BoundingBox.Min.x)
 		// 	// Y axis

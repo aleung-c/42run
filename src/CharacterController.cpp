@@ -181,8 +181,8 @@ void	CharacterController::HandleJump()
 			Character->Transform.Position.y
 				= Tools::LinearInterpolation(Character->Transform.Position.y, JumpMaxHeight, lerpMu);
 
-			// check if max height reached. (-0.02 to avoid last lerp slowing down)
-			if (Character->Transform.Position.y >= JumpMaxHeight - 0.02)
+			// check if max height reached.
+			if (Character->Transform.Position.y >= JumpMaxHeight)
 			{
 				MaxHeightReached = true;
 				JumpUsed = true;
