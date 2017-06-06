@@ -13,6 +13,7 @@
 
 CharacterController::CharacterController()
 :
+	IsAlive(true),
 	GravityForce(DEFAULT_GRAVITY_FORCE),
 	JumpForce(DEFAULT_JUMP_FORCE),
 	MoveSpeed(DEFAULT_MOVE_SPEED),
@@ -26,6 +27,8 @@ CharacterController::CharacterController()
 	IsOnGround = true;
 	lerpMu = 0.0;
 	CharacterGroundHeight = 2.5;
+	IsInvincible = false;
+	InvincibilityTime = DEFAULT_INVINCIBILITY_TIME;
 }
 
 CharacterController::~CharacterController()
@@ -50,10 +53,6 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 	CharacterCollider = new GameObject("CharacterCollider", "./ressources/models/character_collision_box.obj");
 	CharacterCollider->Transform.Position = Character->Transform.Position;
 
-	// GameUIObject *UItest = new GameUIObject("UI test", "./ressources/UI_Elem_1.bmp");
-	// if (UItest)
-	// {
-	// }
 }
 
 /*
@@ -64,9 +63,11 @@ void	CharacterController::InitCharacter(glm::vec3 Position)
 void	CharacterController::LoadCharacterAnimationsKeys()
 {
 	Character_Idle = new GameObject("Character", "./ressources/models/character_idle.obj");
+	Character_Dead = new GameObject("Character_key", "./ressources/models/character_dead.obj");
 	Character_Running1 = new GameObject("Character_key", "./ressources/models/character_running_1.obj");
 	Character_Running2 = new GameObject("Character_key", "./ressources/models/character_running_2.obj");
 	Character_Jumping = new GameObject("Character_key", "./ressources/models/character_jumping.obj");
+	Character_Dead->Visible = false;
 	Character_Idle->Visible = false;
 	Character_Running1->Visible = false;
 	Character_Running2->Visible = false;
@@ -83,7 +84,7 @@ void	CharacterController::SetRunAnimation()
 	Character->MorphAnimation.Stop();
 	Character->MorphAnimation.ClearFrames();
 	Character->MorphAnimation.SetRepeat(true);
-	Character->MorphAnimation.SetSpeed(0.2);
+	Character->MorphAnimation.SetSpeed(WorldController->WorldSpeed);
 	Character->MorphAnimation.AddKeyFrame(Character_Running1);
 	Character->MorphAnimation.AddKeyFrame(Character);
 	Character->MorphAnimation.AddKeyFrame(Character_Running2);
@@ -104,15 +105,64 @@ void	CharacterController::SetJumpAnimation()
 	Character->MorphAnimation.Start();
 }
 
+void	CharacterController::SetIdleAnimation()
+{
+	Character->MorphAnimation.Stop();
+	Character->MorphAnimation.ClearFrames();
+}
+
+void	CharacterController::SetDeadAnimation()
+{
+	Character->MorphAnimation.Stop();
+	Character->MorphAnimation.ClearFrames();
+	Character->MorphAnimation.SetRepeat(false);
+	Character->MorphAnimation.SetSpeed(0.07);
+	Character->MorphAnimation.SetStayOnEnd(true);
+	Character->MorphAnimation.CurFrame = Character_Idle;
+	Character->MorphAnimation.AddKeyFrame(Character_Dead);
+	Character->MorphAnimation.Start();
+}
+
 /*
 **	Called at each frame.
 */
 
 void	CharacterController::Update()
 {
-	HandleMoving();
-	HandleJump();
-	CharacterCollider->Transform.Position = Character->Transform.Position;
+	if (IsAlive)
+	{
+		HandleMoving();
+		HandleJump();
+		
+		HandleInvincibility();
+
+		CharacterCollider->Transform.Position = Character->Transform.Position;
+	}
+}
+
+void	CharacterController::SetInvincible()
+{
+	IsInvincible = true;
+	StartInvincibility = std::chrono::system_clock::now();
+}
+
+void	CharacterController::HandleInvincibility()
+{
+	if (IsInvincible == true)
+	{
+		ElapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>
+			(std::chrono::system_clock::now() - StartInvincibility).count();
+		if (ElapsedSeconds >= InvincibilityTime)
+		{
+			IsInvincible = false;
+		}
+	}
+}
+
+void	CharacterController::SetDead()
+{
+	IsAlive = false;
+	SetDeadAnimation();
 }
 
 void	CharacterController::HandleMoving()

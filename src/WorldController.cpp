@@ -7,7 +7,8 @@ WorldController::WorldController()
 	GameSpaceMin_X(DEFAULT_GAMESPACE_MIN_X),
 	WorldGenDepth(DEFAULT_WORLD_GEN_DEPTH),
 	SpawnTimerStarted(false),
-	TimeUntilSpawn(DEFAULT_SEC_UNTIL_OBSTACLE)
+	TimeUntilSpawn(DEFAULT_SEC_UNTIL_OBSTACLE),
+	CoinTimeUntilSpawn(DEFAULT_SEC_UNTIL_COIN)
 {
 	// GameSpaceMax_X = 11.0;
 	// GameSpaceMin_X = -8.0;
@@ -28,7 +29,9 @@ void	WorldController::InitObstacles()
 {
 	// fallen chair
 	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/chair_1.obj"));
-	ObstaclesList.back()->Transform.Position.y = 0.7;
+	ObstaclesList.back()->Transform.Position.y = 1.0;
+	// grillage obstacle pillar
+	ObstaclesList.push_back(new GameObject("Obstacle_wall_1", "./ressources/models/obstacle_wall_1.obj"));
 	// grillage obstacle pillar
 	ObstaclesList.push_back(new GameObject("Obstacle_wall_1", "./ressources/models/obstacle_wall_1.obj"));
 	// WoodPillar obstacle
@@ -36,12 +39,17 @@ void	WorldController::InitObstacles()
 	// desk 1
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 2.0;
+	// desk 1 - second
+	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
+	ObstaclesList.back()->Transform.Position.y = 2.0;
 	// desk 1 reversed.
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1b", "./ressources/models/table_desk_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 2.0;
 	ObstaclesList.back()->Transform.Rotation.y = 180.0;
 	// long step
-	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/obstacle_step_1.obj"));
+	ObstaclesList.push_back(new GameObject("Obstacle_step_1", "./ressources/models/obstacle_step_1.obj"));
+		// long step
+	ObstaclesList.push_back(new GameObject("Obstacle_step_1", "./ressources/models/obstacle_step_1.obj"));
 
 	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
 		it != ObstaclesList.end(); it++)
@@ -59,8 +67,15 @@ void	WorldController::InitObstacles()
 void	WorldController::InitCoins()
 {
 	CoinList.push_back(new GameObject("Coin", "./ressources/models/coin.obj"));
-	CoinList.back()->Transform.Position.y = 1.0;
-
+	CoinList.push_back(new GameObject("Coin", "./ressources/models/coin.obj"));
+	for (std::vector<GameObject *>::iterator it = CoinList.begin();
+		it != CoinList.end(); it++)
+	{
+		(*it)->Visible = false;
+		(*it)->Transform.Position.z = -15.0;
+		(*it)->Transform.Position.y = 2.0;
+		(*it)->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
+	}
 }
 
 void		WorldController::InitTextureVariations()
@@ -168,43 +183,116 @@ void	WorldController::ObstacleSpawn()
 			SpawnTimerStarted = false;
 		}
 	}
-	// spawn obstacle from pool.
 }
+
+void	WorldController::CoinSpawn()
+{
+	// set random timer start or reset counter;
+	if (CoinSpawnTimerStarted == false)
+	{
+		CoinSpawnTimerStarted = true;
+		CoinStart = std::chrono::system_clock::now();
+	}
+	if (CoinSpawnTimerStarted)
+	{
+		// look for timer time's up.
+		CoinEnd = std::chrono::system_clock::now();
+
+		CoinElapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>
+			(CoinEnd - CoinStart).count();
+
+		if (CoinElapsedSeconds >= CoinTimeUntilSpawn)
+		{
+			// spawn new obstacle
+			SpawnedObject = CoinList[rand() % (CoinList.size())];
+			if (SpawnedObject->Transform.Position.z < -10.0)
+			{
+				SpawnedObject->Visible = true;
+				SpawnedObject->Transform.Position.z = 50.0;
+				SpawnedObject->Transform.Position.x = Tools::GetRandomDouble(GameSpaceMin_X, GameSpaceMax_X);
+
+				SpawnedObject->Transform.Scale.x = 0.0;
+				SpawnedObject->Transform.Scale.y = 0.0;
+				SpawnedObject->Transform.Scale.z = 0.0;
+			}
+			// reset timer
+			CoinSpawnTimerStarted = false;
+		}
+	}
+}
+
 
 void	WorldController::UpdateWorld()
 {
-	// spawn obstacles on the field
-	ObstacleSpawn();
-	// obstacle move toward player
-	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
-			it != ObstaclesList.end(); it++)
+	if (IsMoving)
 	{
-		// soft scale transition for respawned elements clipping.
-		if ((*it)->Transform.Scale.x < 1.0)
+		// spawn obstacles on the field
+		ObstacleSpawn();
+		CoinSpawn();
+		// obstacle move toward player
+		for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
+				it != ObstaclesList.end(); it++)
 		{
-			(*it)->Transform.Scale.x += AppearStrength;
-			(*it)->Transform.Scale.y += AppearStrength;
-			(*it)->Transform.Scale.z += AppearStrength;
+			// soft scale transition for respawned elements clipping.
+			if ((*it)->Transform.Scale.x < 1.0)
+			{
+				(*it)->Transform.Scale.x += AppearStrength;
+				(*it)->Transform.Scale.y += AppearStrength;
+				(*it)->Transform.Scale.z += AppearStrength;
+			}
+			(*it)->Transform.Position.z -= WorldSpeed;
 		}
-		(*it)->Transform.Position.z -= WorldSpeed;
-	}
 
-	// Operations on every spawned objects.
-	for (std::vector<GameObject *>::iterator it = WorldObjects.begin();
-			it != WorldObjects.end(); it++)
-	{
-		// every world object in the list moves toward the player.
-		(*it)->Transform.Position.z -= WorldSpeed;
-
-		// soft scale transition for respawned elements clipping.
-		if ((*it)->Transform.Scale.x < 1.0)
+		// coin move toward player
+		for (std::vector<GameObject *>::iterator it = CoinList.begin();
+				it != CoinList.end(); it++)
 		{
-			(*it)->Transform.Scale.x += AppearStrength;
-			(*it)->Transform.Scale.y += AppearStrength;
-			(*it)->Transform.Scale.z += AppearStrength;
+			// soft scale transition for respawned elements clipping.
+			if ((*it)->Transform.Scale.x < 1.0)
+			{
+				(*it)->Transform.Scale.x += AppearStrength;
+				(*it)->Transform.Scale.y += AppearStrength;
+				(*it)->Transform.Scale.z += AppearStrength;
+			}
+			(*it)->Transform.Position.z -= WorldSpeed;
+			(*it)->Transform.Rotation.y += 3.0;
 		}
-		RepushObjectsAtFront((*it));
+
+		// Operations on every spawned objects.
+		for (std::vector<GameObject *>::iterator it = WorldObjects.begin();
+				it != WorldObjects.end(); it++)
+		{
+			// every world object in the list moves toward the player.
+			(*it)->Transform.Position.z -= WorldSpeed;
+
+			// soft scale transition for respawned elements clipping.
+			if ((*it)->Transform.Scale.x < 1.0)
+			{
+				(*it)->Transform.Scale.x += AppearStrength;
+				(*it)->Transform.Scale.y += AppearStrength;
+				(*it)->Transform.Scale.z += AppearStrength;
+			}
+			RepushObjectsAtFront((*it));
+		}
 	}
+}
+
+/*
+**	Stop the world from moving and spawning items.
+*/
+
+void	WorldController::Stop()
+{
+	IsMoving = false;
+}
+
+/*
+**	Put the world back in motion.
+*/
+
+void	WorldController::Move()
+{
+	IsMoving = true;
 }
 
 void	WorldController::RepushObjectsAtFront(GameObject *obj)

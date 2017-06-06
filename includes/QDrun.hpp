@@ -84,6 +84,7 @@
 # define DEFAULT_GAMESPACE_MIN_X -9.0
 # define DEFAULT_WORLD_GEN_DEPTH 6
 
+# define DEFAULT_INVINCIBILITY_TIME 3 // in seconds
 # define DEFAULT_GRAVITY_FORCE 0.34
 # define DEFAULT_JUMP_FORCE 0.4
 # define DEFAULT_MOVE_SPEED 0.2
@@ -92,13 +93,25 @@
 
 // Gameplay difficulty defines
 
-# define DEFAULT_SEC_UNTIL_OBSTACLE 5
+# define DEFAULT_SEC_UNTIL_OBSTACLE 6
+# define DEFAULT_SEC_UNTIL_COIN 5
 
 typedef enum		e_GameScene
 {
 	MAIN_MENU,
 	IN_GAME
 }					t_GameScene;
+
+typedef struct		s_GameDatas
+{
+	int				PlayerLife;
+	int				PlayerCoins;
+	double			Distance;
+	int				Score;
+	double			CurDistanceStep;
+	double			DifficultyStep;
+
+}					t_GameDatas;
 
 class				Tools;
 class				UIController;

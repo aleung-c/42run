@@ -3,9 +3,9 @@
 GamePlayController::GamePlayController()
 :	
 	CurrentScene(MAIN_MENU),
-	OnGameStartLaunched(false),
 	CollidingObject(NULL),
-	ButtonPressed(false)
+	ButtonPressed(false),
+	_onGameStartLaunched(false)
 
 {
 
@@ -49,6 +49,8 @@ void		GamePlayController::InitGame()
 	// UIElem->Transform.Position = glm::vec3(200.0, 120.0, 0.0);
 	// UIElem2 = new GameUIObject("UIELEM2", "./ressources/UI_Elem_1.bmp");
 	// UIElem2->Transform.Position = glm::vec3(600.0, 120.0, 0.0);
+
+	// Game Mechanics initialization.
 	GameEngineController::Instance().DebugMode = true;
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
@@ -60,19 +62,38 @@ void		GamePlayController::InitGame()
 
 	MainMenuBackground = new GameUIObject("MainMenuBack", "./ressources/MainMenuBackground.bmp");
 	World.InitObstacles();
+	World.InitCoins();
 	World.InitTextureVariations();
 	World.SpawnInitialWorld();
 	Character.InitCharacter(glm::vec3(0.0, 0.0, -3.0));
 	lerpmu = 0.0;
 
 	CollisionController.InitGameCollisions(&Character, &World);
+
+	// Gameplay Initialisation
+	ResetGameDatas(GameDatas);
 }
+
+void			GamePlayController::ResetGameDatas(t_GameDatas &GameDatas)
+{
+	GameDatas.PlayerLife = 3;
+	GameDatas.PlayerCoins = 0;
+
+	GameDatas.DifficultyStep = 100.0;
+	GameDatas.Distance = 0.0;
+	GameDatas.CurDistanceStep = 0.0;
+}
+
+/*
+**	Launched when the running game start (scene = IN_GAME)
+*/
 
 void			GamePlayController::OnGameStart()
 {
 	// start the character running animation
 	Character.SetRunAnimation();
 	UI.InitUI();
+	World.Move();
 }
 
 // --------------------------------------------------------------------	//
@@ -114,17 +135,43 @@ void	GamePlayController::Update()
 	}
 	else if (CurrentScene == IN_GAME)
 	{
-		if (OnGameStartLaunched == false)
+		if (_onGameStartLaunched == false)
 		{
 			OnGameStart();
-			OnGameStartLaunched = true;
+			_onGameStartLaunched = true;
 		}
 		World.UpdateWorld();
 		Character.Update();
 		if ((CollidingObject = CollisionController.PlayerCollides()))
 		{
 			std::cout << "COLLISION WITH " << CollidingObject->Name << std::endl;
+			// ----- Character Collision
+			if (CollidingObject->Name == "Coin" && CollidingObject->Visible == true)
+			{
+				GameDatas.PlayerCoins += 1;
+				CollidingObject->Visible = false;
+				CollidingObject->Transform.Position.z = -20.0;
+			}
+			else
+			{
+				// ----- Collision with obstacle
+				if (Character.IsInvincible == false)
+				{
+					Character.SetInvincible();
+					GameDatas.PlayerLife -= 1;
+					if (GameDatas.PlayerLife <= 0)
+					{
+						std::cout << "Player dead!" << std::endl;
+						World.Stop();
+						Character.SetDead();
+					}
+				}
+			}
 		}
+		if (Character.IsAlive)
+			GameDatas.Distance += World.WorldSpeed;
+		GameModifier(GameDatas);
+		UI.UpdateUIValues(GameDatas);
 	}
 }
 
@@ -205,3 +252,22 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 	// 	}
 	// }
 }
+
+/*
+**	Special method that will modify the game values to set higher difficulty as time
+**	goes by and also set the current score;
+*/
+
+void	GamePlayController::GameModifier(t_GameDatas &GameDatas)
+{
+	GameDatas.Score = (int)GameDatas.Distance + (10 * GameDatas.PlayerCoins);
+	GameDatas.CurDistanceStep += World.WorldSpeed;
+	if (GameDatas.CurDistanceStep >= GameDatas.DifficultyStep)
+	{
+		World.WorldSpeed += 0.1;
+		GameDatas.CurDistanceStep = 0.0;
+		GameDatas.DifficultyStep *= 2.0;
+		World.TimeUntilSpawn -= 1; // one second less between spawns.
+	}
+}
+

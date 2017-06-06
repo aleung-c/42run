@@ -18,6 +18,8 @@ class WorldController
 		float							GameSpaceMax_X;
 		float							GameSpaceMin_X;
 
+		bool							IsMoving;
+
 		int								WorldGenDepth; // number of world steps to be generated ahead.
 		float							AppearStrength;
 
@@ -41,6 +43,15 @@ class WorldController
 
 		GameObject						*SpawnedObject;
 
+		// ------ Coin spawning
+		bool							CoinSpawnTimerStarted;
+
+		// time points
+		int								CoinTimeUntilSpawn;
+		int								CoinElapsedSeconds;
+		std::chrono::time_point<std::chrono::system_clock>	CoinStart;
+		std::chrono::time_point<std::chrono::system_clock>	CoinEnd;
+
 
 		WorldController();
 		~WorldController();
@@ -52,8 +63,13 @@ class WorldController
 		void	SpawnInitialWorld();
 
 		void	ObstacleSpawn();
+		void	CoinSpawn();
 
 		void	UpdateWorld();
+
+		void	Stop();
+		void	Move();
+
 		void	RepushObjectsAtFront(GameObject *obj);
 
 	private:

@@ -35,6 +35,15 @@ GameObject		*GameCollisionController::PlayerCollides()
 			return ((*it));
 		}
 	}
+	for (std::vector<GameObject *>::iterator it = World->CoinList.begin();
+			it != World->CoinList.end(); it++)
+	{
+		// Check for player - obstacle collisions
+		if (BoxCollisionIntersects(Character->CharacterCollider, (*it)))
+		{
+			return ((*it));
+		}
+	}
 	return (NULL);
 
 }

@@ -21,7 +21,7 @@ class UIController
 
 		void					InitUI();
 
-	
+		void					UpdateUIValues(t_GameDatas &gameDatas);
 };
 
 #endif

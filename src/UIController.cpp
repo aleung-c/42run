@@ -56,3 +56,10 @@ void		UIController::InitUI()
 	CoinValue->Transform.Position.y = 50.0;
 
 }
+
+void 	UIController::UpdateUIValues(t_GameDatas &gameDatas)
+{
+	LifeValue->Text = std::to_string(gameDatas.PlayerLife);
+	CoinValue->Text = std::to_string(gameDatas.PlayerCoins);
+	ScoreTextValue->Text = std::to_string(gameDatas.Score);
+}

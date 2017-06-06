@@ -15,12 +15,15 @@ class CharacterController
 
 		// Animation key frames
 		GameObject	*Character_Idle;
+		GameObject	*Character_Dead;
 		GameObject	*Character_Running1;
 		GameObject	*Character_Running2;
 		GameObject	*Character_Jumping;
 
 		// Collider for gameplay purposes
 		GameObject	*CharacterCollider;
+
+		bool		IsAlive;
 
 		float		CharacterGroundHeight;
 
@@ -45,16 +48,27 @@ class CharacterController
 		bool		IsRunning;
 		bool		IsJumping;
 
+		bool		IsInvincible;
+		std::chrono::time_point<std::chrono::system_clock>	StartInvincibility;
+		int			InvincibilityTime;
+		int			ElapsedSeconds;
+
 		void		InitCharacter(glm::vec3 Position);
 		void		LoadCharacterAnimationsKeys();
 
 		void		SetRunAnimation();
 		void		SetJumpAnimation();
+		void		SetIdleAnimation();
+		void		SetDeadAnimation();
 
 		void		HandleMoving();
 		void		HandleJump();
 		void		HandleControls(GLFWwindow* window, int key, int scancode, int action, int mods);
 		void		Update();
+
+		void		HandleInvincibility();
+		void		SetInvincible();
+		void		SetDead();
 };
 
 #endif
