@@ -30,6 +30,7 @@ class WorldController
 
 		// ------ Obstacle spawning
 		std::vector<GameObject *>		ObstaclesList;
+		std::vector<GameObject *>		CoinList;
 		bool							SpawnTimerStarted;
 
 		// time points
@@ -46,6 +47,7 @@ class WorldController
 
 		void	InitTextureVariations();
 		void	InitObstacles();
+		void	InitCoins();
 
 		void	SpawnInitialWorld();
 

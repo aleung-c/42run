@@ -28,7 +28,7 @@ void	WorldController::InitObstacles()
 {
 	// fallen chair
 	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/chair_1.obj"));
-	ObstaclesList.back()->Transform.Rotation.y = 90.0;
+	ObstaclesList.back()->Transform.Position.y = 0.7;
 	// grillage obstacle pillar
 	ObstaclesList.push_back(new GameObject("Obstacle_wall_1", "./ressources/models/obstacle_wall_1.obj"));
 	// WoodPillar obstacle
@@ -36,20 +36,32 @@ void	WorldController::InitObstacles()
 	// desk 1
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 2.0;
-	ObstaclesList.back()->Transform.Rotation.y = 90.0;
 	// desk 1 reversed.
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1b", "./ressources/models/table_desk_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 2.0;
-	ObstaclesList.back()->Transform.Rotation.y = -90.0;
+	ObstaclesList.back()->Transform.Rotation.y = 180.0;
+	// long step
+	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/obstacle_step_1.obj"));
 
 	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
 		it != ObstaclesList.end(); it++)
 	{
 		(*it)->Visible = false;
+		(*it)->Transform.Position.z = -15.0;
 		(*it)->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
 	}
 }
 
+/*
+**	Bonus : coins to pick up.
+*/
+
+void	WorldController::InitCoins()
+{
+	CoinList.push_back(new GameObject("Coin", "./ressources/models/coin.obj"));
+	CoinList.back()->Transform.Position.y = 1.0;
+
+}
 
 void		WorldController::InitTextureVariations()
 {
@@ -93,12 +105,10 @@ void	WorldController::SpawnInitialWorld()
 	for (int i = 0; i != WorldGenDepth; i++)
 	{
 		WorldObjects.push_back(new GameObject("WallRight", "./ressources/models/basic_wall_1.obj"));
-		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMin_X;
 		WorldObjects.back()->Transform.Position.y = 5;
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		WorldObjects.push_back(new GameObject("WallLeft", "./ressources/models/basic_wall_1.obj"));
-		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMax_X;
 		WorldObjects.back()->Transform.Position.y = 5;
 		WorldObjects.back()->Transform.Position.z = z_pos;
@@ -109,12 +119,10 @@ void	WorldController::SpawnInitialWorld()
 	for (int i = 0; i != (WorldGenDepth / 2); i++)
 	{
 		WorldObjects.push_back(new GameObject("GroundBlock", "./ressources/models/ground_block_1.obj"));
-		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMin_X;
 		WorldObjects.back()->Transform.Position.y = -0.25;
 		WorldObjects.back()->Transform.Position.z = z_pos;
 		WorldObjects.push_back(new GameObject("CeilingBlock", "./ressources/models/ceiling_1.obj"));
-		WorldObjects.back()->Transform.Rotation.y += 90;
 		WorldObjects.back()->Transform.Position.x = GameSpaceMax_X;
 		WorldObjects.back()->Transform.Position.y = 14;
 		WorldObjects.back()->Transform.Position.z = z_pos;

@@ -3,6 +3,7 @@
 GamePlayController::GamePlayController()
 :	
 	CurrentScene(MAIN_MENU),
+	OnGameStartLaunched(false),
 	CollidingObject(NULL),
 	ButtonPressed(false)
 
@@ -26,7 +27,7 @@ GamePlayController&		GamePlayController::Instance()
 //																		//
 // --------------------------------------------------------------------	//
 
-void	GamePlayController::InitGame()
+void		GamePlayController::InitGame()
 {
 
 	// ----- DEBUG and showcase engine.
@@ -65,6 +66,13 @@ void	GamePlayController::InitGame()
 	lerpmu = 0.0;
 
 	CollisionController.InitGameCollisions(&Character, &World);
+}
+
+void			GamePlayController::OnGameStart()
+{
+	// start the character running animation
+	Character.SetRunAnimation();
+	UI.InitUI();
 }
 
 // --------------------------------------------------------------------	//
@@ -106,6 +114,11 @@ void	GamePlayController::Update()
 	}
 	else if (CurrentScene == IN_GAME)
 	{
+		if (OnGameStartLaunched == false)
+		{
+			OnGameStart();
+			OnGameStartLaunched = true;
+		}
 		World.UpdateWorld();
 		Character.Update();
 		if ((CollidingObject = CollisionController.PlayerCollides()))

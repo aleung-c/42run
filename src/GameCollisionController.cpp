@@ -39,6 +39,10 @@ GameObject		*GameCollisionController::PlayerCollides()
 
 }
 
+/*
+**	Simple AABB Collision, does not take rotation into account.
+*/
+
 bool			GameCollisionController::BoxCollisionIntersects(GameObject *obj1, GameObject *obj2)
 {
 	if (	// X axis AABB

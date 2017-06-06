@@ -101,6 +101,7 @@ typedef enum		e_GameScene
 }					t_GameScene;
 
 class				Tools;
+class				UIController;
 class				WorldController;
 class				CharacterController;
 class				GameCollisionController;
@@ -108,6 +109,7 @@ class				GamePlayController;
 class				GlobalGameController;
 
 # include "Tools.hpp"
+# include "UIController.hpp"
 # include "WorldController.hpp"
 # include "CharacterController.hpp"
 # include "GameCollisionController.hpp"

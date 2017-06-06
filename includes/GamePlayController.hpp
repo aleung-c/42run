@@ -1,6 +1,8 @@
 #ifndef GAMEPLAYCONTROLLER_HPP
 # define GAMEPLAYCONTROLLER_HPP
 
+# include "QDrun.hpp"
+
 class GamePlayController
 {
 	public:
@@ -22,12 +24,17 @@ class GamePlayController
 		GameObject					*MainCamera;
 		glm::vec3					*CameraLookAtPos;
 
+		bool						OnGameStartLaunched;
+
+		// ----- Controllers
 		WorldController				World;
 		CharacterController			Character;
+		UIController				UI;
 
 		GameCollisionController		CollisionController;
 		GameObject					*CollidingObject;
 
+		// ----- Scene variables
 		GameUIObject				*MainMenuBackground;
 		bool						ButtonPressed;
 		bool						TransitionDone;
@@ -37,6 +44,8 @@ class GamePlayController
 		~GamePlayController();
 
 		void						InitGame();
+
+		void						OnGameStart();
 
 		// Loop functions
 		void						Update();

@@ -73,8 +73,8 @@ void	CharacterController::LoadCharacterAnimationsKeys()
 	Character_Jumping->Visible = false;
 
 	Character->MorphAnimation.SetSpeed(0.2);
-	SetRunAnimation();
-	Character->MorphAnimation.Start();
+	// SetRunAnimation();
+	// Character->MorphAnimation.Start();
 }
 
 void	CharacterController::SetRunAnimation()
