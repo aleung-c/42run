@@ -23,8 +23,7 @@ class WorldController
 		int								WorldGenDepth; // number of world steps to be generated ahead.
 		float							AppearStrength;
 
-		std::vector<t_bmp_texture *>	WallTexturesVariations;		
-		t_bmp_texture					*new_wall_text;
+		std::vector<t_bmp_texture *>	WallTexturesVariations;
 
 		GameObject						*BackgroundPlane;
 
@@ -36,6 +35,7 @@ class WorldController
 		bool							SpawnTimerStarted;
 
 		// time points
+		int								NbSpawn;
 		int								TimeUntilSpawn;
 		int								ElapsedSeconds;
 		std::chrono::time_point<std::chrono::system_clock>	Start;
@@ -67,13 +67,17 @@ class WorldController
 
 		void	UpdateWorld();
 
+		void	RepushObjectsAtFront(GameObject *obj);
+
+		void	ResetWorld();
+
 		void	Stop();
 		void	Move();
 
-		void	RepushObjectsAtFront(GameObject *obj);
 
 	private:
-		t_bmp_texture					*tmp_texture;
+		t_bmp_texture					*_tmp_texture;
+		int								_spawn_i;
 	
 };
 

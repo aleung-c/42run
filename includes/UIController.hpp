@@ -20,6 +20,8 @@ class UIController
 		GameTextObject			*CoinValue;
 
 		void					InitUI();
+		void					HideUI();
+		void					ShowUI();
 
 		void					UpdateUIValues(t_GameDatas &gameDatas);
 };

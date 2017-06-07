@@ -55,6 +55,29 @@ void		UIController::InitUI()
 	CoinValue->Transform.Position.x = 270.0;
 	CoinValue->Transform.Position.y = 50.0;
 
+	HideUI();
+}
+
+void UIController::HideUI()
+{
+	ScoreFond->Visible = false;
+	ScoreTextLabel->Visible = false;
+	ScoreTextValue->Visible = false;
+	LifePic->Visible = false;
+	LifeValue->Visible = false;
+	CoinPic->Visible = false;
+	CoinValue->Visible = false;
+}
+
+void UIController::ShowUI()
+{
+	ScoreFond->Visible = true;
+	ScoreTextLabel->Visible = true;
+	ScoreTextValue->Visible = true;
+	LifePic->Visible = true;
+	LifeValue->Visible = true;
+	CoinPic->Visible = true;
+	CoinValue->Visible = true;
 }
 
 void 	UIController::UpdateUIValues(t_GameDatas &gameDatas)

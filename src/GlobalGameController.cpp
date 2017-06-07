@@ -1,5 +1,10 @@
 #include "../includes/QDrun.hpp"
 
+/*
+**	The main Controller for the 42run.
+**	Can also be seen as "minimum code for the aleung-c engine".
+*/
+
 GlobalGameController::GlobalGameController() : Game(GamePlayController::Instance())
 {
 
@@ -21,6 +26,11 @@ void	GlobalGameController::InitGame()
 	glfwSetKeyCallback(GameEngine->Window, &GamePlayController::KeyCallback);
 	Game.InitGame();
 }
+
+/*
+**	The main loop for our game, linking our gameplay
+**	and the visual engine.
+*/
 
 void	GlobalGameController::MainLoop()
 {	

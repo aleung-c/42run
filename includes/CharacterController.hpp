@@ -52,6 +52,7 @@ class CharacterController
 		std::chrono::time_point<std::chrono::system_clock>	StartInvincibility;
 		int			InvincibilityTime;
 		int			ElapsedSeconds;
+		int			FrameCounter;
 
 		void		InitCharacter(glm::vec3 Position);
 		void		LoadCharacterAnimationsKeys();
@@ -69,6 +70,8 @@ class CharacterController
 		void		HandleInvincibility();
 		void		SetInvincible();
 		void		SetDead();
+
+		void		ResetCharacter();
 };
 
 #endif

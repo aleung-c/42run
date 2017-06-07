@@ -84,7 +84,10 @@ void	CharacterController::SetRunAnimation()
 	Character->MorphAnimation.Stop();
 	Character->MorphAnimation.ClearFrames();
 	Character->MorphAnimation.SetRepeat(true);
-	Character->MorphAnimation.SetSpeed(WorldController->WorldSpeed);
+	if (WorldController->WorldSpeed < 1.0)
+		Character->MorphAnimation.SetSpeed(WorldController->WorldSpeed);
+	else
+		Character->MorphAnimation.SetSpeed(1.0);
 	Character->MorphAnimation.AddKeyFrame(Character_Running1);
 	Character->MorphAnimation.AddKeyFrame(Character);
 	Character->MorphAnimation.AddKeyFrame(Character_Running2);
@@ -144,17 +147,29 @@ void	CharacterController::SetInvincible()
 {
 	IsInvincible = true;
 	StartInvincibility = std::chrono::system_clock::now();
+	FrameCounter = 0;
 }
 
 void	CharacterController::HandleInvincibility()
 {
 	if (IsInvincible == true)
 	{
+		// Blinking player
+		FrameCounter += 1;
+		if (FrameCounter % 4 == 0)
+		{
+			if (Character->Visible == true)
+				Character->Visible = false;
+			else
+				Character->Visible = true;
+		}
+		// check invincibility end;
 		ElapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>
 			(std::chrono::system_clock::now() - StartInvincibility).count();
 		if (ElapsedSeconds >= InvincibilityTime)
 		{
 			IsInvincible = false;
+			Character->Visible = true;
 		}
 	}
 }
@@ -242,7 +257,8 @@ void	CharacterController::HandleJump()
 		{
 			if (IsOnGround == false)
 			{
-				// gravity pulling down.
+				JumpUsed = true;
+				// gravity pulling down because max height reached.
 				if (Character->Transform.Position.y - GravityForce < CharacterGroundHeight)
 					Character->Transform.Position.y = CharacterGroundHeight;
 				else
@@ -298,4 +314,17 @@ void	CharacterController::HandleControls(GLFWwindow* window, int key, int scanco
 			JumpUsed = false;
 		}
 	}
+}
+
+void	CharacterController::ResetCharacter()
+{
+	// animation to IDLE
+	Character->MorphAnimation.Stop();
+	Character->MorphAnimation.ClearFrames();
+	Character->MorphAnimation.CurFrame = Character_Idle;
+	// Reset Position
+	Character->Transform.Position.x = 0.0;
+	Character->Transform.Position.y = CharacterGroundHeight;
+	CharacterCollider->Transform.Position = Character->Transform.Position;
+	IsAlive = true;
 }

@@ -84,7 +84,7 @@
 # define DEFAULT_GAMESPACE_MIN_X -9.0
 # define DEFAULT_WORLD_GEN_DEPTH 6
 
-# define DEFAULT_INVINCIBILITY_TIME 3 // in seconds
+# define DEFAULT_INVINCIBILITY_TIME 2 // in seconds
 # define DEFAULT_GRAVITY_FORCE 0.34
 # define DEFAULT_JUMP_FORCE 0.4
 # define DEFAULT_MOVE_SPEED 0.2
@@ -93,6 +93,7 @@
 
 // Gameplay difficulty defines
 
+# define DEFAULT_NB_SPAWN 1
 # define DEFAULT_SEC_UNTIL_OBSTACLE 6
 # define DEFAULT_SEC_UNTIL_COIN 5
 

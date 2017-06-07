@@ -3,18 +3,17 @@
 
 # include "QDrun.hpp"
 
-class GamePlayController
+/*
+**	The main class concerning the gameplay.
+**	Will handle quite everything from movement to collision,
+**	using controller subclasses.
+**
+**	-> Singleton due to GLFW events handling limitations.
+*/
+
+class	GamePlayController
 {
 	public:
-		// ----- DEBUG and showcase engine.
-		// GameObject				*Character;
-		// GameObject				*BasicWall;
-
-		// GameTextObject			*HelloText;
-		// GameTextObject			*HelloText2;
-		// GameUIObject				*UIElem;
-		// GameUIObject				*UIElem2;s
-
 		// lazy singleton for c language glfw key callback.
 		static GamePlayController&			Instance();
 
@@ -24,8 +23,6 @@ class GamePlayController
 
 		GameObject					*MainCamera;
 		glm::vec3					*CameraLookAtPos;
-
-		
 
 		// ----- Controllers
 		WorldController				World;
@@ -39,8 +36,7 @@ class GamePlayController
 		GameUIObject				*MainMenuBackground;
 		bool						ButtonPressed;
 		bool						TransitionDone;
-		float						lerpmu;
-
+		
 		GamePlayController();
 		~GamePlayController();
 
@@ -51,15 +47,21 @@ class GamePlayController
 
 		// ----- Loop functions
 		void						Update();
+		void						HandleGameCollision();
 		void						LateUpdate();
 
 		// ------ Event methods
 		static void					KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-		void						GameModifier(t_GameDatas &GameDatas);
+		void						GameModifier();
+		void						ResetGame();
 
 	private:
+		float						_lerpmu;
 		bool						_onGameStartLaunched;
 		static GamePlayController	m_instance;
+		bool						_spawnStep1;
+		bool						_spawnStep2;
+		bool						_spawnStep3;
 };
 
 #endif

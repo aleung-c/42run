@@ -29,29 +29,7 @@ GamePlayController&		GamePlayController::Instance()
 
 void		GamePlayController::InitGame()
 {
-
-	// ----- DEBUG and showcase engine.
-	// Character = new GameObject("Character", "./ressources/BasicCriypticman.obj");
-	// Character->Transform.Position = glm::vec3(3.0, 0.0, 0.0);
-
-	// BasicWall = new GameObject("BasicWall", "./ressources/BasicWall.obj");
-	// BasicWall->Transform.Position = glm::vec3(1.0, 0.0, 0.0);
-
-	// HelloText = new GameTextObject("HelloText1", "Hello 42 run");
-	// HelloText->Transform.Position = glm::vec3(0.0, 0.0, 0.0);
-	// HelloText->Color = glm::vec3(1.0, 1.0, 1.0);
-
-	// HelloText2 = new GameTextObject("HelloText1", "Hello2pgbcvl");
-	// HelloText2->Transform.Position = glm::vec3(100.0, 70.0, 0.0);
-	// HelloText2->Color = glm::vec3(1.0, 1.0, 1.0);
-
-	// UIElem = new GameUIObject("UIELEM1", "./ressources/UI_Elem_1.bmp");
-	// UIElem->Transform.Position = glm::vec3(200.0, 120.0, 0.0);
-	// UIElem2 = new GameUIObject("UIELEM2", "./ressources/UI_Elem_1.bmp");
-	// UIElem2->Transform.Position = glm::vec3(600.0, 120.0, 0.0);
-
 	// Game Mechanics initialization.
-	GameEngineController::Instance().DebugMode = true;
 	MainCamera = GameEngineController::Instance().GetCamera();
 	CameraLookAtPos = GameEngineController::Instance().GetCameraLookAt();
 
@@ -66,19 +44,20 @@ void		GamePlayController::InitGame()
 	World.InitTextureVariations();
 	World.SpawnInitialWorld();
 	Character.InitCharacter(glm::vec3(0.0, 0.0, -3.0));
-	lerpmu = 0.0;
+	Character.CharacterCollider->Visible = false;
+	_lerpmu = 0.0;
 
 	CollisionController.InitGameCollisions(&Character, &World);
 
 	// Gameplay Initialisation
 	ResetGameDatas(GameDatas);
+	UI.InitUI();
 }
 
 void			GamePlayController::ResetGameDatas(t_GameDatas &GameDatas)
 {
 	GameDatas.PlayerLife = 3;
 	GameDatas.PlayerCoins = 0;
-
 	GameDatas.DifficultyStep = 100.0;
 	GameDatas.Distance = 0.0;
 	GameDatas.CurDistanceStep = 0.0;
@@ -90,10 +69,12 @@ void			GamePlayController::ResetGameDatas(t_GameDatas &GameDatas)
 
 void			GamePlayController::OnGameStart()
 {
-	// start the character running animation
 	Character.SetRunAnimation();
-	UI.InitUI();
+	UI.ShowUI();
 	World.Move();
+	// World Spawn timers reset
+	World.Start = std::chrono::system_clock::now();
+	World.CoinStart = std::chrono::system_clock::now();
 }
 
 // --------------------------------------------------------------------	//
@@ -103,16 +84,11 @@ void			GamePlayController::OnGameStart()
 // --------------------------------------------------------------------	//
 
 /*
-**	Launched after the check for events and before the drawing;
+**	Called every frame after the check for events and before the drawing;
 */
 
 void	GamePlayController::Update()
 {
-	// ----- DEBUG and showcase engine.
-	// Character->Transform.Rotation.y += 0.001;
-	// Character->Transform.Position.z += 0.001;
-	// BasicWall->Transform.Rotation.y += 0.003;
-
 	if (CurrentScene == MAIN_MENU)
 	{
 		if (ButtonPressed == true)
@@ -120,21 +96,22 @@ void	GamePlayController::Update()
 			// transitionning to ingame;
 			if (MainMenuBackground->Transform.Position.x < 1280.0)
 			{
-				MainMenuBackground->Transform.Position.x = Tools::LinearInterpolation(MainMenuBackground->Transform.Position.x, 1280.0, lerpmu);
-				lerpmu += 0.005;
+				MainMenuBackground->Transform.Position.x = Tools::LinearInterpolation(MainMenuBackground->Transform.Position.x, 1280.0, _lerpmu);
+				_lerpmu += 0.005;
 			}
 			else
 			{
 				TransitionDone = true;
-				lerpmu = 0.0;
+				_lerpmu = 0.0;
 				CurrentScene = IN_GAME;
+				ButtonPressed = false;
 				std::cout << "Go to IN_GAME Scene" << std::endl;
 			}
-
 		}
 	}
 	else if (CurrentScene == IN_GAME)
 	{
+		// ----- On game start
 		if (_onGameStartLaunched == false)
 		{
 			OnGameStart();
@@ -142,35 +119,38 @@ void	GamePlayController::Update()
 		}
 		World.UpdateWorld();
 		Character.Update();
+
+		// ----- Collision Event handling.
 		if ((CollidingObject = CollisionController.PlayerCollides()))
 		{
-			std::cout << "COLLISION WITH " << CollidingObject->Name << std::endl;
-			// ----- Character Collision
-			if (CollidingObject->Name == "Coin" && CollidingObject->Visible == true)
+			HandleGameCollision();
+		}
+		if (Character.IsAlive)
+		{
+			GameDatas.Distance += World.WorldSpeed;
+		}
+
+		// ----- from death to MAIN_MENU
+		if (Character.IsAlive == false && ButtonPressed == true)
+		{
+			// transitionning to main menu;
+			if (MainMenuBackground->Transform.Position.x > 0.0)
 			{
-				GameDatas.PlayerCoins += 1;
-				CollidingObject->Visible = false;
-				CollidingObject->Transform.Position.z = -20.0;
+				MainMenuBackground->Transform.Position.x = Tools::LinearInterpolation(MainMenuBackground->Transform.Position.x, 0.0, _lerpmu);
+				_lerpmu += 0.01;
 			}
 			else
 			{
-				// ----- Collision with obstacle
-				if (Character.IsInvincible == false)
-				{
-					Character.SetInvincible();
-					GameDatas.PlayerLife -= 1;
-					if (GameDatas.PlayerLife <= 0)
-					{
-						std::cout << "Player dead!" << std::endl;
-						World.Stop();
-						Character.SetDead();
-					}
-				}
+				TransitionDone = true;
+				_lerpmu = 0.0;
+				CurrentScene = MAIN_MENU;
+				ButtonPressed = false;
+				std::cout << "Go to MAIN_MENU Scene" << std::endl;
+
+				ResetGame();
 			}
 		}
-		if (Character.IsAlive)
-			GameDatas.Distance += World.WorldSpeed;
-		GameModifier(GameDatas);
+		GameModifier();
 		UI.UpdateUIValues(GameDatas);
 	}
 }
@@ -190,6 +170,42 @@ void	GamePlayController::LateUpdate()
 //																		//
 // --------------------------------------------------------------------	//
 
+/*
+**	What happens when the player collides with something.
+*/
+
+void	GamePlayController::HandleGameCollision()
+{
+	// std::cout << "COLLISION WITH " << CollidingObject->Name << std::endl;
+	// ----- Character Collision
+	if (CollidingObject->Name == "Coin" && CollidingObject->Visible == true)
+	{
+		GameDatas.PlayerCoins += 1;
+		CollidingObject->Visible = false;
+		CollidingObject->Transform.Position.z = -20.0; // make the coin disappear
+			// Life Up
+		if (GameDatas.PlayerCoins % 10 == 0)
+		{
+			GameDatas.PlayerLife += 1;
+		}
+	}
+	else
+	{
+		// ----- Collision with obstacle
+		if (Character.IsInvincible == false)
+		{
+			Character.SetInvincible();
+			GameDatas.PlayerLife -= 1;
+			if (GameDatas.PlayerLife <= 0)
+			{
+				std::cout << "Player dead!" << std::endl;
+				World.Stop();
+				Character.SetDead();
+			}
+		}
+	}
+}
+
 // This method is STATIC -> glfw constraint.
 // It forced me to make the GamePlayController a singleton instance...
 void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -200,7 +216,17 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 
 	if (GameInstance->CurrentScene == IN_GAME)
 	{
+		// ----- Character default events
 		GameInstance->Character.HandleControls(window, key, scancode, action, mods);
+		// ----- EVENTS DURING CHARACTER DEATH
+		if (GameInstance->Character.IsAlive == false)
+		{
+			if (action == GLFW_PRESS)
+			{
+				GameInstance->ButtonPressed = true;
+				GameInstance->UI.HideUI();
+			}
+		}
 	}
 	else if (action == GLFW_PRESS)
 	{
@@ -212,62 +238,59 @@ void	GamePlayController::KeyCallback(GLFWwindow* window, int key, int scancode, 
 		std::cout << "Exiting 42run ..." << std::endl;
 		exit(0);
 	}
-
-	// // Camera displacing tests
-	// if (action == GLFW_PRESS)
-	// {
-	// 	std::cout << "pressed any key!" << std::endl;
-	// 	GameInstance->ButtonPressed = true;
-	// 	if (GameInstance->CurrentScene == IN_GAME)
-	//  	{
-	// 		// camera placement debug
-	// 		if (key == GLFW_KEY_W)
-	// 		{
-	// 			GameInstance->MainCamera->Transform.Position.z += 0.5f;
-	// 		}
-	// 		else if (key == GLFW_KEY_S)
-	// 		{
-	// 			GameInstance->MainCamera->Transform.Position.z -= 0.5f;
-	// 		}
-	// 		else if (key == GLFW_KEY_A)
-	// 		{
-	// 			GameInstance->MainCamera->Transform.Position.x += 0.5f;
-	// 		}
-	// 		else if (key == GLFW_KEY_D)
-	// 		{
-	// 			GameInstance->MainCamera->Transform.Position.x -= 0.5f;
-	// 		}
-	// 		else if (key == GLFW_KEY_SPACE)
-	// 		{
-	// 			GameInstance->MainCamera->Transform.Position.y += 0.5f;
-	// 		}
-	// 		else if (key == GLFW_KEY_C)
-	// 		{
-	// 			GameInstance->MainCamera->Transform.Position.y -= 0.5f;
-	// 		}
-			
-	// 		std::cout << "Camera: " << GameInstance->MainCamera->Transform.Position.x << "x "
-	// 			<< GameInstance->MainCamera->Transform.Position.y << "y "
-	// 			<< GameInstance->MainCamera->Transform.Position.z << "z" << std::endl;
-	// 	}
-	// }
 }
 
 /*
-**	Special method that will modify the game values to set higher difficulty as time
+**	Will modify the game values to set higher difficulty as time
 **	goes by and also set the current score;
 */
 
-void	GamePlayController::GameModifier(t_GameDatas &GameDatas)
+void	GamePlayController::GameModifier()
 {
-	GameDatas.Score = (int)GameDatas.Distance + (10 * GameDatas.PlayerCoins);
+	GameDatas.Score = (int)GameDatas.Distance + (100 * GameDatas.PlayerCoins);
 	GameDatas.CurDistanceStep += World.WorldSpeed;
-	if (GameDatas.CurDistanceStep >= GameDatas.DifficultyStep)
+	if (GameDatas.Score >= GameDatas.DifficultyStep)
 	{
-		World.WorldSpeed += 0.1;
+		World.WorldSpeed += 0.08;
 		GameDatas.CurDistanceStep = 0.0;
 		GameDatas.DifficultyStep *= 2.0;
-		World.TimeUntilSpawn -= 1; // one second less between spawns.
+		if (World.TimeUntilSpawn > 1)
+			World.TimeUntilSpawn -= 1; // one second less between spawns.
+	}
+	if (_spawnStep1 == false && GameDatas.Score > 2000)
+	{
+		World.NbSpawn += 1;
+		_spawnStep1 = true;
+	}
+	if (_spawnStep2 == false && GameDatas.Score > 5000)
+	{
+		World.NbSpawn += 1;
+		_spawnStep2 = true;
+	}
+	if (_spawnStep3 == false && GameDatas.Score > 8000)
+	{
+		World.NbSpawn += 1;
+		_spawnStep3 = true;
 	}
 }
 
+/*
+**	Used to reset the game after the player died
+**	and the UI screen hid everything.
+*/
+
+void	GamePlayController::ResetGame()
+{
+	World.ResetWorld();
+	Character.ResetCharacter();
+	GameDatas.PlayerLife = 3;
+	GameDatas.PlayerCoins = 0;
+	GameDatas.Score = 0;
+	GameDatas.Distance = 0.0;
+	GameDatas.CurDistanceStep = 0.0;
+	GameDatas.DifficultyStep = 100;
+	_spawnStep1 = false;
+	_spawnStep2 = false;
+	_spawnStep3 = false;
+	_onGameStartLaunched = false;
+}

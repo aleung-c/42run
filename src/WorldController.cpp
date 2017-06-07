@@ -7,6 +7,7 @@ WorldController::WorldController()
 	GameSpaceMin_X(DEFAULT_GAMESPACE_MIN_X),
 	WorldGenDepth(DEFAULT_WORLD_GEN_DEPTH),
 	SpawnTimerStarted(false),
+	NbSpawn(DEFAULT_NB_SPAWN),
 	TimeUntilSpawn(DEFAULT_SEC_UNTIL_OBSTACLE),
 	CoinTimeUntilSpawn(DEFAULT_SEC_UNTIL_COIN)
 {
@@ -21,12 +22,21 @@ WorldController::~WorldController()
 
 }
 
+// --------------------------------------------------------------------	//
+//																		//
+//	World initialization												//
+//																		//
+// --------------------------------------------------------------------	//
+
 /*
 **	Before using them, we will load the obstacles in memory.
 */
 
 void	WorldController::InitObstacles()
 {
+	// fallen chair
+	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/chair_1.obj"));
+	ObstaclesList.back()->Transform.Position.y = 1.0;
 	// fallen chair
 	ObstaclesList.push_back(new GameObject("Obstacle_chair_1", "./ressources/models/chair_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 1.0;
@@ -42,20 +52,28 @@ void	WorldController::InitObstacles()
 	// desk 1 - second
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 2.0;
+	// desk 1 - third
+	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1", "./ressources/models/table_desk_1.obj"));
+	ObstaclesList.back()->Transform.Position.y = 2.0;
 	// desk 1 reversed.
 	ObstaclesList.push_back(new GameObject("Obstacle_table_desk_1b", "./ressources/models/table_desk_1.obj"));
 	ObstaclesList.back()->Transform.Position.y = 2.0;
 	ObstaclesList.back()->Transform.Rotation.y = 180.0;
 	// long step
 	ObstaclesList.push_back(new GameObject("Obstacle_step_1", "./ressources/models/obstacle_step_1.obj"));
-		// long step
+	// long step
 	ObstaclesList.push_back(new GameObject("Obstacle_step_1", "./ressources/models/obstacle_step_1.obj"));
+	// long step
+	ObstaclesList.push_back(new GameObject("Obstacle_step_1", "./ressources/models/obstacle_step_1.obj"));
+
+	// deep wall
+	ObstaclesList.push_back(new GameObject("Obstacle_wall_deep", "./ressources/models/obstacle_wall_deep.obj"));
 
 	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin();
 		it != ObstaclesList.end(); it++)
 	{
 		(*it)->Visible = false;
-		(*it)->Transform.Position.z = -15.0;
+		(*it)->Transform.Position.z = -40.0;
 		(*it)->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
 	}
 }
@@ -81,25 +99,25 @@ void	WorldController::InitCoins()
 void		WorldController::InitTextureVariations()
 {
 	// init different wall textures
-	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
-	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_1.bmp");
-	WallTexturesVariations.push_back(tmp_texture);
+	_tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(_tmp_texture, "./ressources/models/basic_wall_1.bmp");
+	WallTexturesVariations.push_back(_tmp_texture);
 
-	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
-	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_2.bmp");
-	WallTexturesVariations.push_back(tmp_texture);
+	_tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(_tmp_texture, "./ressources/models/basic_wall_2.bmp");
+	WallTexturesVariations.push_back(_tmp_texture);
 
-	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
-	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_3.bmp");
-	WallTexturesVariations.push_back(tmp_texture);
+	_tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(_tmp_texture, "./ressources/models/basic_wall_3.bmp");
+	WallTexturesVariations.push_back(_tmp_texture);
 
-	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
-	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_4.bmp");
-	WallTexturesVariations.push_back(tmp_texture);
+	_tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(_tmp_texture, "./ressources/models/basic_wall_4.bmp");
+	WallTexturesVariations.push_back(_tmp_texture);
 
-	tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
-	GameEngineController::LoadTextureFile(tmp_texture, "./ressources/models/basic_wall_5.bmp");
-	WallTexturesVariations.push_back(tmp_texture);
+	_tmp_texture = (t_bmp_texture *)malloc(sizeof(t_bmp_texture));
+	GameEngineController::LoadTextureFile(_tmp_texture, "./ressources/models/basic_wall_5.bmp");
+	WallTexturesVariations.push_back(_tmp_texture);
 }
 
 /*
@@ -145,6 +163,12 @@ void	WorldController::SpawnInitialWorld()
 	}
 }
 
+// --------------------------------------------------------------------	//
+//																		//
+//	World in game object spawning										//
+//																		//
+// --------------------------------------------------------------------	//
+
 /*
 **	For this method, ill make a randomized timer that will spawn obstacles at interval.
 */
@@ -167,17 +191,20 @@ void	WorldController::ObstacleSpawn()
 
 		if (ElapsedSeconds >= TimeUntilSpawn)
 		{
-			// spawn new obstacle
-			SpawnedObject = ObstaclesList[rand() % (ObstaclesList.size())];
-			if (SpawnedObject->Transform.Position.z < -10.0)
+			for (_spawn_i = 0; _spawn_i != NbSpawn; _spawn_i++)
 			{
-				SpawnedObject->Visible = true;
-				SpawnedObject->Transform.Position.z = 50.0;
-				SpawnedObject->Transform.Position.x = Tools::GetRandomDouble(GameSpaceMin_X, GameSpaceMax_X);
+				// spawn new obstacle
+				SpawnedObject = ObstaclesList[rand() % (ObstaclesList.size())];
+				if (SpawnedObject->Transform.Position.z < -10.0)
+				{
+					SpawnedObject->Visible = true;
+					SpawnedObject->Transform.Position.z = 70.0 + (float)(_spawn_i * 2);
+					SpawnedObject->Transform.Position.x = Tools::GetRandomDouble((double)GameSpaceMin_X + 1.0, (double)GameSpaceMax_X - 1.0);
 
-				SpawnedObject->Transform.Scale.x = 0.0;
-				SpawnedObject->Transform.Scale.y = 0.0;
-				SpawnedObject->Transform.Scale.z = 0.0;
+					SpawnedObject->Transform.Scale.x = 0.0;
+					SpawnedObject->Transform.Scale.y = 0.0;
+					SpawnedObject->Transform.Scale.z = 0.0;
+				}
 			}
 			// reset timer
 			SpawnTimerStarted = false;
@@ -208,8 +235,8 @@ void	WorldController::CoinSpawn()
 			if (SpawnedObject->Transform.Position.z < -10.0)
 			{
 				SpawnedObject->Visible = true;
-				SpawnedObject->Transform.Position.z = 50.0;
-				SpawnedObject->Transform.Position.x = Tools::GetRandomDouble(GameSpaceMin_X, GameSpaceMax_X);
+				SpawnedObject->Transform.Position.z = 60.0;
+				SpawnedObject->Transform.Position.x = Tools::GetRandomDouble(GameSpaceMin_X + 1.0, GameSpaceMax_X - 1.0);
 
 				SpawnedObject->Transform.Scale.x = 0.0;
 				SpawnedObject->Transform.Scale.y = 0.0;
@@ -221,6 +248,11 @@ void	WorldController::CoinSpawn()
 	}
 }
 
+// --------------------------------------------------------------------	//
+//																		//
+//	World Update methods												//
+//																		//
+// --------------------------------------------------------------------	//
 
 void	WorldController::UpdateWorld()
 {
@@ -277,24 +309,6 @@ void	WorldController::UpdateWorld()
 	}
 }
 
-/*
-**	Stop the world from moving and spawning items.
-*/
-
-void	WorldController::Stop()
-{
-	IsMoving = false;
-}
-
-/*
-**	Put the world back in motion.
-*/
-
-void	WorldController::Move()
-{
-	IsMoving = true;
-}
-
 void	WorldController::RepushObjectsAtFront(GameObject *obj)
 {
 	// check wall going out of screen.
@@ -317,4 +331,54 @@ void	WorldController::RepushObjectsAtFront(GameObject *obj)
 			obj->Transform.Scale = glm::vec3(0.0, 0.0, 0.0);
 		}
 	}
+}
+
+// --------------------------------------------------------------------	//
+//																		//
+//	World Control methods												//
+//																		//
+// --------------------------------------------------------------------	//
+
+/*
+**	Stop the world from moving and spawning items.
+*/
+
+void	WorldController::Stop()
+{
+	IsMoving = false;
+}
+
+/*
+**	Put the world back in motion.
+*/
+
+void	WorldController::Move()
+{
+	IsMoving = true;
+}
+
+void	WorldController::ResetWorld()
+{
+	// set texture wall back to white.
+	for (std::vector<GameObject *>::iterator it = WorldObjects.begin(); it != WorldObjects.end(); it++)
+	{
+		if ((*it)->Name == "WallRight" || (*it)->Name == "WallLeft")
+			(*it)->Texture.Swap(WallTexturesVariations[0]);
+	}
+
+	// put all obstacles back to the back;
+	for (std::vector<GameObject *>::iterator it = ObstaclesList.begin(); it != ObstaclesList.end(); it++)
+	{
+		(*it)->Transform.Position.z = -40.0;
+	}
+
+	// same for the coins.
+	for (std::vector<GameObject *>::iterator it = CoinList.begin(); it != CoinList.end(); it++)
+	{
+		(*it)->Transform.Position.z = -40.0;
+	}
+	WorldSpeed = DEFAULT_WORLD_SPEED;
+	NbSpawn = DEFAULT_NB_SPAWN;
+	TimeUntilSpawn = DEFAULT_SEC_UNTIL_OBSTACLE;
+
 }
